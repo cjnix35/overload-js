@@ -1,7 +1,7 @@
 {
-  "name": "webcpp",
+  "name": "overload-js",
   "version": "1.0.0",
-  "description": "Like an Electron.js , but 10x faster to run and 10x slower to develop",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "build": "NODE_ENV=production webpack",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cjnix35/webpack_cpp_template.git"
+    "url": "git+https://github.com/cjnix35/overload-js.git"
   },
   "keywords": [],
   "author": "cjnix35",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cjnix35/webpack_cpp_template/issues"
+    "url": "https://github.com/cjnix35/overload-js/issues"
   },
-  "homepage": "https://github.com/cjnix35/webpack_cpp_template#readme",
+  "homepage": "https://github.com/cjnix35/overload-js#readme",
   "devDependencies": {
     "@babel/core": "^7.19.3",
     "@babel/preset-env": "^7.19.4",
