@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Node modules
+node_modules
+
+# Dist folder
+dist
