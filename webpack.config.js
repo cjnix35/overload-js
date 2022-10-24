@@ -27,7 +27,6 @@ module.exports = {
   },
 
   output: {
-    publicPath: "/dist/",
     assetModuleFilename: "assets/[hash][ext][query]",
     clean: true,
   },
@@ -66,6 +65,9 @@ module.exports = {
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: "",
+            },
           },
           "css-loader",
           "postcss-loader",
