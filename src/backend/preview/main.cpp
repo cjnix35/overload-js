@@ -8,7 +8,6 @@
 #include "../api/webview.h"
 #include "../api/watcher.hpp"
 
-using namespace inotify;
 using json = nlohmann::json;
 
 webview::webview w(true, nullptr);
