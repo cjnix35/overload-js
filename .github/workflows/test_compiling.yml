@@ -47,8 +47,11 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt install -y libwebkit2gtk-4.0-dev
         
-      - name: Compile a release build of overload.js
+      - name: Configure
         run: mkdir build && cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
+        
+      - name: Compile a release build of overload.js
+        run: make -C build/ -j4
 
       - name: Test if it can be launched
-        run: ./preview
+        run: ./build/preview
