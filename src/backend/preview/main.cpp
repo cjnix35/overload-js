@@ -16,33 +16,13 @@ webview::webview w(true, nullptr);
 WebUI Interface;
 
 #include "../api/bind.hpp"
-/*
+
 void WaitForChanges(){
 
-
-    auto handleNotification = [&](Notification notification) {
+    using namespace water::watcher;
+    watch(Interface.GetPath().c_str(), [](const event::event& this_event) {
         w.eval("window.location.reload()");
-        sleep(1);
-    };
-
-    auto events = { Event::modify,
-                    Event::remove,
-                    Event::move };
-
-
-    auto notifier = BuildNotifier()
-                        .watchPathRecursively(Interface.GetPath())
-                        .ignoreFileOnce("fileIgnoredOnce")
-                        .ignoreFile("fileIgnored")
-                        .onEvents(events, handleNotification);
-
-    std::thread([&](){ notifier.run(); }).join();
-
-}*/
-
-void WaitForChanges(){
-
-    
+    });    
 
 }
 
