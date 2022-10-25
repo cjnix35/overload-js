@@ -64,7 +64,7 @@ target_include_directories(main PUBLIC ${BACKEND_PATH})
 target_include_directories(preview PUBLIC ${BACKEND_PATH})
 target_link_libraries(preview PUBLIC ui)
 if (UNIX)
-        target_link_libraries(preview PUBLIC ${GTK_LIBRARIES} inotify-cpp)
+        target_link_libraries(preview PUBLIC ${GTK_LIBRARIES})
         target_link_libraries(main PUBLIC ${GTK_LIBRARIES})
 endif()
 
