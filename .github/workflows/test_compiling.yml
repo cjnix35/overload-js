@@ -44,7 +44,7 @@ jobs:
 
       - name: Install necessary packages
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: sudo apt install webkit2gtk-4.0
+        run: sudo apt install webkit2gtk-4.0-dev
 
       - name: Configure
         run: mkdir build && cd build && cmake ..
