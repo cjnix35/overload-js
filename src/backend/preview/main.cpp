@@ -7,6 +7,7 @@
 
 #include "../api/json.hpp"
 #include "../api/webview.h"
+#include "../api/watcher.hpp"
 
 using namespace inotify;
 using json = nlohmann::json;
@@ -15,7 +16,7 @@ webview::webview w(true, nullptr);
 WebUI Interface;
 
 #include "../api/bind.hpp"
-
+/*
 void WaitForChanges(){
 
 
@@ -36,6 +37,12 @@ void WaitForChanges(){
                         .onEvents(events, handleNotification);
 
     std::thread([&](){ notifier.run(); }).join();
+
+}*/
+
+void WaitForChanges(){
+
+    
 
 }
 
