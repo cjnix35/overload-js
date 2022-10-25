@@ -1,0 +1,52 @@
+name: compile_and_test
+
+on:
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build_and_test:
+    name: Build & test overload.js on ${{ matrix.os }} with ${{ matrix.compiler }}.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        compiler: [ g++-latest ]
+        include:
+          - os: ubuntu-latest
+            compiler: g++-latest
+            target: Linux
+
+          - os: macos-latest
+            compiler: g++-latest
+            target: Macos
+
+          - os: windows-latest
+            compiler: cl
+            target: Windows
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Add msbuild to PATH
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Configure
+        run: mkdir build && cd build && cmake ..
+
+      - name: Compile a release build of overload.js
+        run: make -j4
+
+      - name: Test if it can be launched
+        run: ./preview
