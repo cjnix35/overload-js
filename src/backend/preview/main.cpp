@@ -7,6 +7,7 @@
 
 #include "../api/json.hpp"
 #include "../api/webview.h"
+#include "../api/watcher.hpp"
 
 using namespace inotify;
 using json = nlohmann::json;
@@ -18,24 +19,10 @@ WebUI Interface;
 
 void WaitForChanges(){
 
-
-    auto handleNotification = [&](Notification notification) {
+    using namespace water::watcher;
+    watch(Interface.GetPath().c_str(), [](const event::event& this_event) {
         w.eval("window.location.reload()");
-        sleep(1);
-    };
-
-    auto events = { Event::modify,
-                    Event::remove,
-                    Event::move };
-
-
-    auto notifier = BuildNotifier()
-                        .watchPathRecursively(Interface.GetPath())
-                        .ignoreFileOnce("fileIgnoredOnce")
-                        .ignoreFile("fileIgnored")
-                        .onEvents(events, handleNotification);
-
-    std::thread([&](){ notifier.run(); }).join();
+    });    
 
 }
 
