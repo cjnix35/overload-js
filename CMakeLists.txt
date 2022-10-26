@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(webcpp_template VERSION 1.0
+project(overload_js VERSION 1.0
         DESCRIPTION "Framework which allows you to combine together speed & efficiency of C++ and beauty of Web technologies"
         LANGUAGES CXX)
 
 include(CheckIPOSupported)
+
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
 
 set(BACKEND_PATH "src/backend" CACHE STRING "Path to backend")
 set(EXAMPLE_PATH "src/backend/examples" CACHE STRING "Path to examples")
@@ -18,15 +22,17 @@ endif()
 
 if (MSVC)
         add_compile_options(/O2 /Ot)
-else()
+else(LINUX)
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(GTK REQUIRED gtk+-3.0 webkit2gtk-4.0)
-        add_compile_options(-Ofast)
 
         include_directories(${GTK_INCLUDE_DIRS})
         link_directories(${GTK_LIBRARY_DIRS})
         add_definitions(${GTK_CFLAGS_OTHER})
+endif()
 
+if (UNIX)
+        add_compile_options(-Ofast)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -63,9 +69,9 @@ target_include_directories(main PUBLIC ${BACKEND_PATH})
 
 target_include_directories(preview PUBLIC ${BACKEND_PATH})
 target_link_libraries(preview PUBLIC ui)
-if (UNIX)
-        target_link_libraries(preview PUBLIC ${GTK_LIBRARIES})
-        target_link_libraries(main PUBLIC ${GTK_LIBRARIES})
+if (LINUX)
+        target_link_libraries(preview PUBLIC ${GTK_LIBRARIES} -lpthread)
+        target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread)
 endif()
 
 file(WRITE "${CMAKE_BINARY_DIR}/window.json" 
