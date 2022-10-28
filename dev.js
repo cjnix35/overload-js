@@ -1,7 +1,7 @@
 const os = require("os");
 const { exec } = require("child_process");
 
-WINDOWS_COMMAND = "npm run build-dev cd build\\Release && preview.exe";
+WINDOWS_COMMAND = "npm run build-dev && cd build\\Release && preview.exe";
 UNIX_COMMAND = "npm run build-dev && cd build/ && ./preview ";
 
 const watch = () => {
