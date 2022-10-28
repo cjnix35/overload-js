@@ -1,13 +1,21 @@
-import capybara from "../assets/images/capybara.png";
 import "../styles/style.css";
+
+import Logo from "./Logo";
 
 const App = () => {
   return (
-    <>
-      <h1 className="text-white font-black bg-gray-500">React and C++</h1>
-
-      <img src={capybara} alt="capybara" />
-    </>
+    <div className="flex flex-col items-center justify-center text-center h-screen">
+      <div className="flex flex-row-reverse items-center">
+        <h1 className="mb-8 font-medium text-6xl ml-8 cursor-pointer hover:text-zinc-600 transition ease-in delay-150">
+          <a href="https://github.com/cjnix35/overload-js" target={"_blank"}>
+            OVERLOAD.JS
+          </a>
+        </h1>
+        <div className="mb-8">
+          <Logo />
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -34,7 +34,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|jpe?g|gif|txt)$/i,
+        test: /\.(png|jpe?g|gif|txt|svg)$/i,
         type: "asset",
         // generator: {emit: false}
         /**
@@ -47,17 +47,13 @@ module.exports = {
           },
         },
       },
+
       {
         //if issuer is jsx/tsx then we use SVGR loader https://react-svgr.com/
-        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.svg$/i,
         issuer: /\.[jt]sx?$/,
+
         use: ["babel-loader", "@svgr/webpack"],
-        type: "asset",
-      },
-      {
-        //else: just svg asset
-        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        type: "asset",
       },
 
       {
