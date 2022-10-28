@@ -6,7 +6,7 @@ const Logo = () => {
       height="296"
       viewBox="0 0 296 296"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      xlmns="http://www.w3.org/2000/svg"
     >
       <g id="polygon_overload">
         <path
@@ -42,9 +42,9 @@ const Logo = () => {
           y2="293.292"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F73221" />
-          <stop offset="1" stop-color="#F73221" stop-opacity="0.4" />
-          <stop offset="1" stop-color="#F73221" stop-opacity="0.4" />
+          <stop stopColor="#F73221" />
+          <stop offset="1" stopColor="#F73221" stopOpacity={0.4} />
+          <stop offset="1" stopColor="#F73221" stopOpacity={0.4} />
         </linearGradient>
       </defs>
     </svg>
