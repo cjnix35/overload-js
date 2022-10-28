@@ -3,10 +3,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 
 let mode = "development";
-let devtool = null;
+let devtool = "source-map";
 if (process.env.NODE_ENV === "production") {
   mode = "production";
-  devtool = "eval-source-map";
+  devtool = undefined;
 }
 
 const plugins = [
