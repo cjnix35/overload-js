@@ -3,8 +3,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 
 let mode = "development";
+let devtool = null;
 if (process.env.NODE_ENV === "production") {
   mode = "production";
+  devtool = "eval-source-map";
 }
 
 const plugins = [
@@ -21,7 +23,7 @@ module.exports = {
   target: target,
   plugins: plugins,
 
-  devtool: "source-map",
+  devtool: devtool,
   entry: {
     index: path.resolve(__dirname, "src/frontend/index.js"),
   },
@@ -36,7 +38,7 @@ module.exports = {
       {
         test: /\.(png|jpe?g|gif|txt|svg)$/i,
         type: "asset",
-        // generator: {emit: false}
+
         /**
          * If you want to inline larger images, you can set
          * a custom `maxSize` for inline:
