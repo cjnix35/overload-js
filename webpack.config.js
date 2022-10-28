@@ -3,8 +3,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 
 let mode = "development";
+let devtool = "source-map";
 if (process.env.NODE_ENV === "production") {
   mode = "production";
+  devtool = undefined;
 }
 
 const plugins = [
@@ -21,7 +23,7 @@ module.exports = {
   target: target,
   plugins: plugins,
 
-  devtool: "source-map",
+  devtool: devtool,
   entry: {
     index: path.resolve(__dirname, "src/frontend/index.js"),
   },
@@ -34,9 +36,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|jpe?g|gif|txt)$/i,
+        test: /\.(png|jpe?g|gif|txt|svg)$/i,
         type: "asset",
-        // generator: {emit: false}
+
         /**
          * If you want to inline larger images, you can set
          * a custom `maxSize` for inline:
@@ -47,17 +49,13 @@ module.exports = {
           },
         },
       },
+
       {
         //if issuer is jsx/tsx then we use SVGR loader https://react-svgr.com/
-        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.svg$/i,
         issuer: /\.[jt]sx?$/,
+
         use: ["babel-loader", "@svgr/webpack"],
-        type: "asset",
-      },
-      {
-        //else: just svg asset
-        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        type: "asset",
       },
 
       {

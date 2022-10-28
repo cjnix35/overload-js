@@ -52,6 +52,3 @@ jobs:
         
       - name: Compile a release build of overload.js
         run: make -C build/ -j4
-
-      - name: Test if it can be launched
-        run: ./build/preview
