@@ -10,7 +10,12 @@ webview::webview w(false, nullptr);
 
 #include "../api/bind.hpp"
 
+#ifdef _WIN32
+int WINAPI WinMain(HINSTANCE hInt, HINSTANCE hPrevInst, LPSTR lpCmdLine,
+                   int nCmdShow) {
+#else
 int main(int argc, char* argv[]) {
+#endif
 
     api::BindInit();
 
