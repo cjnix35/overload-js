@@ -13,20 +13,20 @@ using json = nlohmann::json;
 namespace api {
 
 
-    std::string MakeDirectory(std::string args){
+    std::string MakeDirectory(std::string args) {
 
         json arr = json::parse(args);
         std::string path = arr[0].get<std::string>();
 
-        if (!std::filesystem::exists(path)){
+        if (!std::filesystem::exists(path)) {
 
-            return std::filesystem::create_directory(path) ? "\"true\"" : "\"false\"";
+            return std::filesystem::create_directory(path) ? "\"true\"" :
+                                                             "\"false\"";
 
         } else return "\"false\"";
-
     }
 
-    std::string ReadFile(std::string args){
+    std::string ReadFile(std::string args) {
 
         json arr = json::parse(args);
         std::string filename = arr[0].get<std::string>();
@@ -41,11 +41,9 @@ namespace api {
             return "\"" + buf.str() + "\"";
 
         } else return "\"false\"";
-
-
     }
 
-    std::string WriteFile(std::string args){
+    std::string WriteFile(std::string args) {
 
         json arr = json::parse(args);
         std::string filename = arr[0].get<std::string>();
@@ -59,11 +57,9 @@ namespace api {
             return "\"true\"";
 
         } else return "\"false\"";
-
-
     }
 
-    std::string AppendFile(std::string args){
+    std::string AppendFile(std::string args) {
 
         json arr = json::parse(args);
         std::string filename = arr[0].get<std::string>();
@@ -77,17 +73,15 @@ namespace api {
             return "\"true\"";
 
         } else return "\"false\"";
-
     }
 
-    std::string RemoveFile(std::string args){
+    std::string RemoveFile(std::string args) {
 
         json arr = json::parse(args);
         std::string filename = arr[0].get<std::string>();
 
         return std::filesystem::remove(filename) ? "\"true\"" : "\"false\"";
-
     }
 
 
-};
+}; // namespace api

@@ -15,15 +15,14 @@ namespace api {
     void BindInit() noexcept {
 
         w.bind("SetWindowSize", api::SetWindowSize);
-        w.bind("SetWindowTitle", api::SetWindowTitle); 
+        w.bind("SetWindowTitle", api::SetWindowTitle);
         w.bind("CloseWindow", api::CloseWindow);
-        w.bind("MakeDir", api::MakeDirectory); 
+        w.bind("MakeDir", api::MakeDirectory);
         w.bind("ReadFile", api::ReadFile);
         w.bind("WriteFile", api::WriteFile);
         w.bind("AppendFile", api::AppendFile);
-        w.bind("RemoveFile", api::RemoveFile);      
-
+        w.bind("RemoveFile", api::RemoveFile);
     }
 
 
-};
+}; // namespace api

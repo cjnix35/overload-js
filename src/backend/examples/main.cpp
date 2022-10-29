@@ -21,9 +21,9 @@ int main(int argc, char* argv[]) {
 
     w.set_title("Some title");
     w.set_size(1200, 700, WEBVIEW_HINT_NONE);
-    w.navigate("file:" + std::filesystem::absolute("../dist/index.html").u8string());
+    w.navigate("file:" +
+               std::filesystem::absolute("../dist/index.html").u8string());
     w.run();
 
     return 0;
-
-} 
+}
