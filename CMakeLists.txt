@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
 
 project(overload_js VERSION 1.0
         DESCRIPTION "Framework which allows you to combine together speed & efficiency of C++ and beauty of Web technologies"
@@ -6,9 +6,8 @@ project(overload_js VERSION 1.0
 
 include(CheckIPOSupported)
 
-if(UNIX AND NOT APPLE)
-    set(LINUX TRUE)
-endif()
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(BACKEND_PATH "src/backend" CACHE STRING "Path to backend")
 set(EXAMPLE_PATH "src/backend/examples" CACHE STRING "Path to examples")
@@ -20,9 +19,21 @@ if(EXISTS "${LOC_PATH}")
     message(FATAL_ERROR "You cannot build in a source directory (or any directory with a CMakeLists.txt file). Please make a build subdirectory. Feel free to remove CMakeCache.txt and CMakeFiles.")
 endif()
 
-if (MSVC)
-        add_compile_options(/O2 /Ot)
-else(LINUX)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        add_compile_options(/Ot /Zc:auto)
+
+	find_program(NUGET_EXE NAMES nuget "${CMAKE_BINARY_DIR}/nuget.exe")
+	if(NOT NUGET_EXE)
+		message("nuget.exe not found.")
+		message(FATAL_ERROR "Please install NuGet package manager, after that run CMake again.")
+	endif()
+
+	exec_program(${NUGET_EXE}
+    	ARGS install "Microsoft.Web.WebView2" -Version 1.0.1370.28 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+	exec_program(${NUGET_EXE}
+    	ARGS install "Microsoft.Windows.ImplementationLibrary" -Version 1.0.220914.1 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+endif()	
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(GTK REQUIRED gtk+-3.0 webkit2gtk-4.0)
 
@@ -46,8 +57,13 @@ endif()
 
 
 add_library(ui STATIC "$CACHE{PREVIEW_PATH}/ui.cpp" "$CACHE{PREVIEW_PATH}/ui.hpp")
-add_executable(preview "$CACHE{PREVIEW_PATH}/main.cpp")
-add_executable(main "$CACHE{EXAMPLE_PATH}/main.cpp")
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	add_executable(preview WIN32 "$CACHE{PREVIEW_PATH}/main.cpp")
+	add_executable(main WIN32 "$CACHE{EXAMPLE_PATH}/main.cpp")
+else()
+	add_executable(preview "$CACHE{PREVIEW_PATH}/main.cpp")
+	add_executable(main "$CACHE{EXAMPLE_PATH}/main.cpp")
+endif()
 
 check_ipo_supported(RESULT result)
 if(result)
@@ -56,24 +72,39 @@ if(result)
   set_target_properties(ui PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-target_compile_features(ui PUBLIC cxx_std_17)
-set_target_properties(ui PROPERTIES CXX_EXTENSIONS OFF)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
+	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
 
-target_compile_features(preview PUBLIC cxx_std_17)
-set_target_properties(preview PROPERTIES CXX_EXTENSIONS OFF)
+	target_link_libraries(preview PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
+	target_link_libraries(preview PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
 
-target_compile_features(main PUBLIC cxx_std_17)
-set_target_properties(main PROPERTIES CXX_EXTENSIONS OFF)
+	set_property(TARGET preview PROPERTY CXX_STANDARD 23)
 
-target_include_directories(main PUBLIC ${BACKEND_PATH})
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Release")
 
-target_include_directories(preview PUBLIC ${BACKEND_PATH})
-target_link_libraries(preview PUBLIC ui)
-if (LINUX)
-        target_link_libraries(preview PUBLIC ${GTK_LIBRARIES} -lpthread)
-        target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread)
-endif()
+file(WRITE "${CMAKE_BINARY_DIR}/Release/window.json" 
+        "{\n"
+        "    \"title\": \"preview\",\n"
+        "    \"width\": 300,\n"
+        "    \"height\": 400\n"
+        "}"
+        )
+        
+file(WRITE "${CMAKE_BINARY_DIR}/Release/layout.json"
+        "[\n"
+        "    {\n"
+        "        \"type\": \"folder\",\n"
+        "        \"path\": \"../../dist/\"\n"
+        "    },\n"
+        "    {\n"
+        "        \"type\": \"file\",\n"
+        "        \"path\": \"../../dist/index.html\"\n"
+        "    }\n"
+        "]"
+        )
 
+else()
 file(WRITE "${CMAKE_BINARY_DIR}/window.json" 
 "{\n"
 "    \"title\": \"preview\",\n"
@@ -94,3 +125,29 @@ file(WRITE "${CMAKE_BINARY_DIR}/layout.json"
 "    }\n"
 "]"
 )
+
+endif()
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	set_property(TARGET preview PROPERTY CXX_STANDARD 23)
+	set(CMAKE_EXE_LINKER_FLAGS "-framework CoreFoundation -framework WebKit -framework CoreServices")
+	    
+endif()
+
+target_compile_features(ui PUBLIC cxx_std_17)
+set_target_properties(ui PROPERTIES CXX_EXTENSIONS OFF)
+
+target_compile_features(preview PUBLIC cxx_std_17)
+set_target_properties(preview PROPERTIES CXX_EXTENSIONS OFF)
+
+target_compile_features(main PUBLIC cxx_std_17)
+set_target_properties(main PROPERTIES CXX_EXTENSIONS OFF)
+
+target_include_directories(main PUBLIC ${BACKEND_PATH})
+
+target_include_directories(preview PUBLIC ${BACKEND_PATH})
+target_link_libraries(preview PUBLIC ui)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        target_link_libraries(preview PUBLIC ${GTK_LIBRARIES} -lpthread)
+        target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread)
+endif()
