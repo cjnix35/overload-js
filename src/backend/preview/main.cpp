@@ -15,13 +15,12 @@ WebUI Interface;
 
 #include "../api/bind.hpp"
 
-void WaitForChanges(){
+void WaitForChanges() {
 
     using namespace water::watcher;
     watch(Interface.GetPath().c_str(), [](const event::event& this_event) {
         w.eval("window.location.reload()");
-    });    
-
+    });
 }
 
 #ifdef _WIN32
@@ -39,11 +38,11 @@ int main(int argc, char* argv[]) {
     conf.close();
 
     w.set_title(j.at("title").get<std::string>());
-    w.set_size(j.at("width").get<std::uint16_t>(), j.at("height").get<std::uint16_t>(), WEBVIEW_HINT_NONE);
-    w.navigate(Interface.GetMainFile());
+    w.set_size(j.at("width").get<std::uint16_t>(),
+               j.at("height").get<std::uint16_t>(), WEBVIEW_HINT_NONE);
+    w.navigate(Interface.GetUrl());
     std::thread(WaitForChanges).detach();
     w.run();
 
     return 0;
-
-} 
+}

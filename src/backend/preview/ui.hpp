@@ -12,19 +12,15 @@ using json = nlohmann::json;
 class WebUI {
 
     private:
-
-        std::string *main_file = new std::string;
+        std::string *url = new std::string;
         std::string *path = new std::string;
 
         json *files = new json;
 
     public:
-
         WebUI();
         ~WebUI();
         void Load();
         std::string GetPath() noexcept;
-        std::string GetMainFile() noexcept;
-
-
+        std::string GetUrl() noexcept;
 };
