@@ -24,7 +24,12 @@ void WaitForChanges(){
 
 }
 
+#ifdef _WIN32
+int WINAPI WinMain(HINSTANCE hInt, HINSTANCE hPrevInst, LPSTR lpCmdLine,
+                   int nCmdShow) {
+#else
 int main(int argc, char* argv[]) {
+#endif
 
     Interface.Load();
     api::BindInit();
