@@ -14,14 +14,14 @@ namespace api {
 
     void BindInit() noexcept {
 
-        w.bind("SetWindowSize", api::SetWindowSize);
-        w.bind("SetWindowTitle", api::SetWindowTitle);
-        w.bind("CloseWindow", api::CloseWindow);
-        w.bind("MakeDir", api::MakeDirectory);
-        w.bind("ReadFile", api::ReadFile);
-        w.bind("WriteFile", api::WriteFile);
-        w.bind("AppendFile", api::AppendFile);
-        w.bind("RemoveFile", api::RemoveFile);
+        w.bind("api_setWindowSize", api::SetWindowSize);
+        w.bind("api_setWindowTitle", api::SetWindowTitle);
+        w.bind("api_closeWindow", api::CloseWindow);
+        w.bind("api_makeDir", api::MakeDirectory);
+        w.bind("api_readFile", api::ReadFile);
+        w.bind("api_writeFile", api::WriteFile);
+        w.bind("api_appendFile", api::AppendFile);
+        w.bind("api_removeFile", api::RemoveFile);
     }
 
 
