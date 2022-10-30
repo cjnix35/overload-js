@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env SERVE=true webpack serve",
     "build": "cross-env NODE_ENV=production webpack",
-    "dev": "node dev.js",
+    "dev": "python dev.py",
     "watch": "webpack --watch"
   },
   "repository": {
