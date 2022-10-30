@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 
     w.set_title(j.at("title").get<std::string>());
     w.set_size(j.at("width").get<std::uint16_t>(), j.at("height").get<std::uint16_t>(), WEBVIEW_HINT_NONE);
-    w.navigate(Interface.GetMainFile());
+    w.navigate("http://localhost:8080/");
     std::thread(WaitForChanges).detach();
     w.run();
 

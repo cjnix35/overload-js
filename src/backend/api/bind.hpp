@@ -13,7 +13,7 @@ namespace api {
 
 
     void BindInit() noexcept {
-
+            
         w.bind("SetWindowSize", api::SetWindowSize);
         w.bind("SetWindowTitle", api::SetWindowTitle); 
         w.bind("CloseWindow", api::CloseWindow);
