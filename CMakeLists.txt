@@ -10,9 +10,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(BACKEND_PATH "src/backend" CACHE STRING "Path to backend")
-set(EXAMPLE_PATH "src/backend/examples" CACHE STRING "Path to examples")
+set(API_PATH "src/backend/api" CACHE STRING "Path to api")
+set(OVERLOAD_APP_PATH "src/backend/app" CACHE STRING "Path to overload-app backend")
 set(DEFAULT_BUILD_TYPE "Release" CACHE STRING "Define default build type")
-set(PREVIEW_PATH "src/backend/preview" CACHE STRING "Path to preview app")
 
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
 if(EXISTS "${LOC_PATH}")
@@ -54,100 +54,30 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-
-
-add_library(ui STATIC "$CACHE{PREVIEW_PATH}/ui.cpp" "$CACHE{PREVIEW_PATH}/ui.hpp")
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-	add_executable(preview WIN32 "$CACHE{PREVIEW_PATH}/main.cpp")
-	add_executable(main WIN32 "$CACHE{EXAMPLE_PATH}/main.cpp")
+	add_executable(main WIN32 "$CACHE{OVERLOAD_APP_PATH}/main.cpp")
 else()
-	add_executable(preview "$CACHE{PREVIEW_PATH}/main.cpp")
-	add_executable(main "$CACHE{EXAMPLE_PATH}/main.cpp")
+	add_executable(main "$CACHE{OVERLOAD_APP_PATH}/main.cpp")
 endif()
 
 check_ipo_supported(RESULT result)
 if(result)
-  set_target_properties(preview PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-  set_target_properties(main PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-  set_target_properties(ui PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+        set_target_properties(main PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
 	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
-
-	target_link_libraries(preview PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
-	target_link_libraries(preview PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
-
-	set_property(TARGET preview PROPERTY CXX_STANDARD 23)
-
-        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Release")
-
-file(WRITE "${CMAKE_BINARY_DIR}/Release/window.json" 
-        "{\n"
-        "    \"title\": \"preview\",\n"
-        "    \"width\": 300,\n"
-        "    \"height\": 400\n"
-        "}"
-        )
-        
-file(WRITE "${CMAKE_BINARY_DIR}/Release/layout.json"
-        "[\n"
-        "    {\n"
-        "        \"type\": \"folder\",\n"
-        "        \"path\": \"../../dist/\"\n"
-        "    },\n"
-        "    {\n"
-        "        \"type\": \"file\",\n"
-        "        \"path\": \"../../dist/index.html\"\n"
-        "    }\n"
-        "]"
-        )
-
-else()
-file(WRITE "${CMAKE_BINARY_DIR}/window.json" 
-"{\n"
-"    \"title\": \"preview\",\n"
-"    \"width\": 300,\n"
-"    \"height\": 400\n"
-"}"
-)
-
-file(WRITE "${CMAKE_BINARY_DIR}/layout.json"
-"[\n"
-"    {\n"
-"        \"type\": \"folder\",\n"
-"        \"path\": \"../dist/\"\n"
-"    },\n"
-"    {\n"
-"        \"type\": \"file\",\n"
-"        \"path\": \"../dist/index.html\"\n"
-"    }\n"
-"]"
-)
-
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-	set_property(TARGET preview PROPERTY CXX_STANDARD 23)
-	set(CMAKE_EXE_LINKER_FLAGS "-framework CoreFoundation -framework WebKit -framework CoreServices")
-	    
+	set(CMAKE_EXE_LINKER_FLAGS "-framework CoreFoundation -framework WebKit -framework CoreServices")  
 endif()
-
-target_compile_features(ui PUBLIC cxx_std_17)
-set_target_properties(ui PROPERTIES CXX_EXTENSIONS OFF)
-
-target_compile_features(preview PUBLIC cxx_std_17)
-set_target_properties(preview PROPERTIES CXX_EXTENSIONS OFF)
 
 target_compile_features(main PUBLIC cxx_std_17)
 set_target_properties(main PROPERTIES CXX_EXTENSIONS OFF)
-
 target_include_directories(main PUBLIC ${BACKEND_PATH})
 
-target_include_directories(preview PUBLIC ${BACKEND_PATH})
-target_link_libraries(preview PUBLIC ui)
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        target_link_libraries(preview PUBLIC ${GTK_LIBRARIES} -lpthread)
         target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread)
 endif()
