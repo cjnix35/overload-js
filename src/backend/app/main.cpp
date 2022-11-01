@@ -29,12 +29,12 @@ int main(int argc, char* argv[]) {
     // If you want to use static file, uncomment lines below and change path to
     // file
 
-    w.navigate("file:" +
-               std::filesystem::absolute("../dist/index.html").u8string());
+    // w.navigate("file:" +
+    //            std::filesystem::absolute("../dist/index.html").u8string());
 
     // If you want to use static file, comment line below
 
-    // w.navigate("http://localhost:8080/");
+    w.navigate("http://localhost:8080/");
     w.run();
 
     return 0;
