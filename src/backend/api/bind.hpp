@@ -7,7 +7,7 @@
 #include "sys/os/os.hpp"
 #include "sys/hardware/cpu.hpp"
 #include "sys/hardware/display.hpp"
-#include "sys/hardware/ram.hpp"
+#include "sys/hardware/mem.hpp"
 
 extern webview::webview w;
 
