@@ -2,10 +2,10 @@ name: build
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   workflow_dispatch:
 
@@ -32,12 +32,12 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Add msbuild to PATH
         if: ${{ matrix.os == 'windows-latest' }}
         uses: microsoft/setup-msbuild@v1.1
-        
+
       - name: Use MSVC Developer command line (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -45,14 +45,14 @@ jobs:
       - name: Install necessary packages (Linux)
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt-get update && sudo apt-get install libwebkit2gtk-4.0-dev -y
-        
+
       - name: Configure
         run: mkdir build && cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
-        
+
       - name: Compile a release build of overload.js (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         run: msbuild build\overload_js.sln -m /property:Configuration=Release
-        
+
       - name: Compile a release build of overload.js (Linux and MacOS)
         if: ${{ matrix.os != 'windows-latest' }}
         run: make -C build/ -j4

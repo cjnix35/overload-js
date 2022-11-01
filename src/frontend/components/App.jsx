@@ -9,6 +9,7 @@ const App = () => {
     SetWindowSize(800, 600);
     SetWindowTitle("OVERLOAD.JS APP");
   }, []);
+
   return (
     <div className="flex flex-col items-center justify-center text-center h-screen">
       <div className="flex flex-row-reverse items-center">
