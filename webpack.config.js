@@ -1,13 +1,11 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const path = require("path");
 
 let mode = "development";
 let devtool = "source-map";
-if (process.env.NODE_ENV === "production") {
-  mode = "production";
-  devtool = undefined;
-}
+let target = "web";
 
 const plugins = [
   new MiniCssExtractPlugin(),
@@ -16,7 +14,13 @@ const plugins = [
   }),
 ];
 
-let target = "web";
+if (process.env.NODE_ENV === "production") {
+  mode = "production";
+  devtool = undefined;
+}
+if (process.env.SERVE) {
+  plugins.push(new ReactRefreshWebpackPlugin());
+}
 
 module.exports = {
   mode: mode,
@@ -77,13 +81,12 @@ module.exports = {
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
+
           options: {
-            /**
-             * From the docs: When set, the given directory will be used
-             * to cache the results of the loader. Future webpack builds
-             * will attempt to read from the cache to avoid needing to run
-             * the potentially expensive Babel recompilation process on each run.
-             */
+            plugins: [
+              process.env.SERVE && require.resolve("react-refresh/babel"),
+            ].filter(Boolean),
+
             cacheDirectory: true,
           },
         },
@@ -91,6 +94,9 @@ module.exports = {
     ],
   },
 
+  devServer: {
+    hot: true,
+  },
   resolve: {
     extensions: [".js", ".jsx"],
   },
