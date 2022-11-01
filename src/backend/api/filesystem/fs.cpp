@@ -19,16 +19,17 @@ namespace api {
     std::string ReadFile(std::string args) {
 
         json arr = json::parse(args);
+        json ret;
         std::string filename = arr[0].get<std::string>();
-        std::stringstream buf;
+        std::string buf;
 
         std::ifstream f(filename, std::ios_base::in);
         if (f.is_open()) {
 
-            buf << f.rdbuf();
+            while (std::getline(f, buf)) { ret.push_back(buf); }
             f.close();
 
-            return "\"" + buf.str() + "\"";
+            return ret.dump();
 
         } else return "\"false\"";
     }
