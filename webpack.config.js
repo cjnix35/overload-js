@@ -40,7 +40,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|jpe?g|gif|txt|svg)$/i,
+        test: /\.(png|jpe?g|svg)$/i,
         type: "asset",
 
         /**
