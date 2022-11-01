@@ -15,12 +15,10 @@ namespace api {
 
 
     void BindInit() noexcept {
-<<<<<<< HEAD
 
         // Takes 2 arguments and resizes window
         // JS: function win_setWindowSize(width, height)
         w.bind("win_setWindowSize", api::SetWindowSize);
-=======
             
         w.bind("SetWindowSize", api::SetWindowSize);
         w.bind("SetWindowTitle", api::SetWindowTitle); 
@@ -30,7 +28,6 @@ namespace api {
         w.bind("WriteFile", api::WriteFile);
         w.bind("AppendFile", api::AppendFile);
         w.bind("RemoveFile", api::RemoveFile);      
->>>>>>> main
 
         // Takes 1 argument and changes title of window
         // JS: function win_setWindowTitle(title)
