@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <cstring>
+#include <vector>
+#include <utility>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 

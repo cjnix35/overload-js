@@ -52,7 +52,7 @@ namespace api {
 
         auto mainDisplayId = CGMainDisplayID();
         return "{\"width\":" +
-               std::to_string(CGDisplayPixelsWide(mainDisplayId);) +
+               std::to_string(CGDisplayPixelsWide(mainDisplayId)) +
                ",\"height\":" +
                std::to_string(CGDisplayPixelsHigh(mainDisplayId)) + "}";
     }

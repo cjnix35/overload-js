@@ -18,7 +18,7 @@ static std::pair<bool, T>
     std::vector<char> ret(len);                                                \
     if (fname(__VA_ARGS__, ret.data(), &len, nullptr, 0)) return {};           \
                                                                                \
-    return ret
+    return ret;
 
 std::vector<char> sysctl(const char* name) {
     SYSCTL_IMPL(::sysctlbyname, name);

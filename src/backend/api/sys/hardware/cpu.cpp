@@ -118,7 +118,7 @@ namespace api {
         const auto data = deconstruct_sysctl_int(ctl_data);
         if (!data.first) return 0;
 
-        return data.second;
+        return std::to_string(data.second);
     }
 
     static std::string sysctl_value(const char* subkey) {
