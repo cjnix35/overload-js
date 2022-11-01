@@ -122,13 +122,13 @@ namespace api {
     }
 
     static std::string sysctl_value(const char* subkey) {
-        auto ctl_data = sysctl(("machdep.cpu."s + subkey).c_str());
+        auto ctl_data = sysctl((std::string("machdep.cpu.") + subkey).c_str());
         if (ctl_data.empty()) return {};
         else return ctl_data.data();
     }
 
     std::string CPUVendor(std::string args) {
-        return "\"" + sysctl_value("vendor") "\"";
+        return "\"" + sysctl_value("vendor") + "\"";
     }
 
     std::string CPUModel(std::string args) {
