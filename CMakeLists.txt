@@ -69,7 +69,7 @@ add_library(overfs "$CACHE{API_PATH}/filesystem/fs.cpp")
 add_library(overcpu "$CACHE{API_PATH}/sys/hardware/cpu.cpp")
 add_library(overgpu "$CACHE{API_PATH}/sys/hardware/gpu.cpp")
 add_library(overdisplay "$CACHE{API_PATH}/sys/hardware/display.cpp")
-add_library(overmem "$CACHE{API_PATH}/sys/hardware/ram.cpp")
+add_library(overmem "$CACHE{API_PATH}/sys/hardware/mem.cpp")
 add_library(overos "$CACHE{API_PATH}/sys/os/os.cpp")
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
