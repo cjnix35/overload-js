@@ -122,8 +122,7 @@ namespace api {
     }
 
     static std::string sysctl_value(const char* subkey) {
-        auto ctl_data = iware::detail::sysctl(
-            ("machdep.cpu."s + subkey).c_str());
+        auto ctl_data = sysctl(("machdep.cpu."s + subkey).c_str());
         if (ctl_data.empty()) return {};
         else return ctl_data.data();
     }
