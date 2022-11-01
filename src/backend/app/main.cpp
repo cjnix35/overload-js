@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
     api::BindInit();
 
-    w.set_title("Some title");
+    w.set_title("Overload.js");
     w.set_size(1200, 700, WEBVIEW_HINT_NONE);
 
     // If you want to use static file, uncomment lines below and change path to
