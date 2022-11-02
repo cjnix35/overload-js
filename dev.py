@@ -6,8 +6,8 @@ OS = os.name    # Windows - "nt"  ,  Mac/Linux - "posix"
 
 # POSIX cd build/ && ./preview
 # Windows cd build\\Release && preview.exe
-POSIXCMD = "cd build/ && ./preview"
-NTCMD = "cd build\\Release && preview.exe"
+POSIXCMD = "cd build/ && ./main"
+NTCMD = "cd build\\Release && main.exe"
 
 NPMCMD = "npm start"
 
