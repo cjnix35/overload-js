@@ -11,6 +11,7 @@
 
 ## Features
 
+- Unopinionated 
 - Cross-platform
 - Blazingly fast
 - Access every bit of OS
