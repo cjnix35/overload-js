@@ -13,6 +13,63 @@ extern webview::webview w;
 
 namespace api {
 
+    typedef std::string (*FnPtr)(std::string);
+    std::map<std::string, FnPtr> Functions = {
+        {"win_closeWindow", api::CloseWindow},
+
+        {"fs_makeDir", api::MakeDirectory},
+        {"fs_readFile", api::ReadFile},
+        {"fs_writeFile", api::WriteFile},
+        {"fs_appendFile", api::AppendFile},
+        {"fs_removeFile", api::RemoveFile},
+
+        {"sys_version", api::Version},
+        {"sys_platform", api::Platform},
+        {"sys_cpuFrequency", api::CPUFrequency},
+        {"sys_cpuVendor", api::CPUVendor},
+        {"sys_cpuModel", api::CPUModel},
+        {"sys_displaySize", api::GetDisplaySize},
+        {"sys_totalPhysMemory", api::GetTotalPhysicalMemory},
+        {"sys_PhysMemoryUsage", api::GetPhysicalMemoryUsage},
+        {"sys_procPhysMemoryUsage", api::GetProcPhysMemoryUsage},
+        {"sys_totalVirtualMemory", api::GetTotalVirtualMemory},
+        {"sys_virtualMemoryUsage", api::GetVirtualMemoryUsage},
+        {"sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage}};
+
+    std::string AsyncWithoutValueCPP(std::string args) {
+
+        json j = json::parse(args);
+        std::string FunctionName = j[0].get<std::string>();
+        j.erase(j.begin());
+
+        std::thread(api::Functions[FunctionName], std::move(j.dump())).detach();
+
+        return "";
+    }
+
+    std::string AsyncCPP(std::string args) {
+
+        const auto lambda = [](std::string function, std::string var,
+                               std::string args) -> void {
+            std::string value = Functions[function](args);
+            w.eval(var + " = " + value + ";");
+        };
+
+
+        json j = json::parse(args);
+        std::string FunctionName = j[0].get<std::string>();
+        std::string VariableName = j[j.size() - 1].get<std::string>();
+        j.erase(j.begin());
+        j.erase(j.end());
+
+        std::promise<std::string> promise;
+        auto future = promise.get_future();
+        std::thread(lambda, std::move(FunctionName), std::move(VariableName),
+                    std::move(j.dump()))
+            .detach();
+
+        return "";
+    }
 
     void BindInit() noexcept {
 
@@ -82,7 +139,7 @@ namespace api {
         // Doesn't take any arguments. Returns how much physical memory is
         // currently in use
         // JS: function sys_totalPhysMemoryUsage()
-        w.bind("sys_totalPhysMemoryUsage", api::GetPhysicalMemoryUsage);
+        w.bind("sys_PhysMemoryUsage", api::GetPhysicalMemoryUsage);
 
         // Doesn't take any arguments. Returns how much physical memory is
         // currently in use by this process
@@ -103,7 +160,16 @@ namespace api {
         // currently in use by this process
         // JS: function sys_procVirtualMemoryUsage()
         w.bind("sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage);
-    }
 
+        // Takes as argument function name (first argument) and any arguments
+        // that is necessary for function
+        // JS: function asyncWithoutValue()
+        w.bind("asyncWithoutValue", api::AsyncWithoutValueCPP);
+
+        // Takes as argument function name (first argument), all arguments
+        // necessary for this function and variable name (last argument)
+        // JS: function asyncWithValue()
+        w.bind("asyncWithValue", api::AsyncCPP);
+    }
 
 }; // namespace api
