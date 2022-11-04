@@ -8,7 +8,6 @@ export default defineConfig({
   publicDir: false,
   base: "", // embedded deployment,
   server: {
-    open: "/src/frontend/index.html",
     port: 8080,
   },
 
