@@ -1,6 +1,7 @@
 #pragma once
 
 #include "webview.h"
+#include "json.hpp"
 
 #include "window/window.hpp"
 #include "filesystem/fs.hpp"
@@ -10,6 +11,7 @@
 #include "sys/hardware/mem.hpp"
 
 extern webview::webview w;
+using json = nlohmann::json;
 
 namespace api {
 

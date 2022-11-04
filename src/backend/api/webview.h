@@ -405,6 +405,54 @@ namespace webview {
 #include <gtk/gtk.h>
 #include <webkit2/webkit2.h>
 
+#include <unistd.h>
+
+
+static gboolean decide_policy_cb(WebKitWebView *web_view,
+                                 WebKitPolicyDecision *decision,
+                                 WebKitPolicyDecisionType type) {
+
+    switch (type) {
+        case WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION:
+            {
+                webkit_policy_decision_use(decision);
+                break;
+            }
+        case WEBKIT_POLICY_DECISION_TYPE_NEW_WINDOW_ACTION:
+            {
+                WebKitNavigationPolicyDecision *navigation_decision =
+                    WEBKIT_NAVIGATION_POLICY_DECISION(decision);
+
+                WebKitNavigationAction *navigation_action =
+                    webkit_navigation_policy_decision_get_navigation_action(
+                        navigation_decision);
+
+                WebKitURIRequest *request =
+                    webkit_navigation_action_get_request(navigation_action);
+
+                system(
+                    (std::string("xdg-open ") +
+                     std::string((char *)webkit_uri_request_get_uri(request)))
+                        .c_str());
+
+                break;
+            }
+        case WEBKIT_POLICY_DECISION_TYPE_RESPONSE:
+            {
+                webkit_policy_decision_use(decision);
+                break;
+            }
+        default:
+            {
+                // Making no decision results in webkit_policy_decision_use()
+                return FALSE;
+            }
+    }
+
+    return true;
+}
+
+
 namespace webview {
     namespace detail {
 
@@ -457,8 +505,14 @@ namespace webview {
                         settings, true);
                     webkit_settings_set_allow_universal_access_from_file_urls(
                         settings, true);
+
+                    g_signal_connect(G_OBJECT(m_webview), "decide-policy",
+                                     (GCallback)decide_policy_cb, NULL);
+
                     webkit_settings_set_enable_fullscreen(settings, true);
                     webkit_settings_set_enable_tabs_to_links(settings, true);
+                    webkit_settings_set_enable_hyperlink_auditing(settings,
+                                                                  true);
                     webkit_settings_set_javascript_can_open_windows_automatically(
                         settings, true);
                     if (debug) {
