@@ -2,13 +2,24 @@
 
 Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
 
-Fixes # (issue)
+### What kind of change does this PR introduce?
 
-## Type of change
+<!-- Check at least one. If you are introducing a new binding, you must reference an issue where this binding has been proposed, discussed and approved by the maintainers. -->
 
-Please delete options that are not relevant.
+- [ ] Bugfix
+- [ ] Feature
+- [ ] Docs
+- [ ] New Binding issue #\_\_\_
+- [ ] Code style update
+- [ ] Refactor
+- [ ] Build-related changes
+- [ ] Other, please describe:
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] This change requires a documentation update
+### Does this PR introduce a breaking change?
+
+<!-- If yes, please describe the impact -->
+
+- [ ] Yes, and the changes were approved in issue #\_\_\_
+- [ ] No
+
+### Other information
