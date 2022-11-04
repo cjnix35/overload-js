@@ -1,15 +1,7 @@
-import { useEffect } from "react";
-import "../styles/style.css";
-
-import Logo from "./Logo";
+import React from "react";
+import Logo from "./components/Logo";
 
 const App = () => {
-  useEffect(() => {
-    // src/backend/api/bind.hpp
-    SetWindowSize(800, 600);
-    SetWindowTitle("OVERLOAD.JS APP");
-  }, []);
-
   return (
     <div className="flex flex-col items-center justify-center text-center h-screen">
       <div className="flex flex-row-reverse items-center">

@@ -1,3 +1,5 @@
+import React from "react";
+
 const Logo = () => {
   return (
     <svg
@@ -6,7 +8,7 @@ const Logo = () => {
       height="296"
       viewBox="0 0 296 296"
       fill="none"
-      xlmns="http://www.w3.org/2000/svg"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <g id="polygon_overload">
         <path
