@@ -3,7 +3,9 @@
 </p>
 
 ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
-![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![React]()
 
 [![build](https://github.com/cjnix35/overload-js/actions/workflows/test_compiling.yml/badge.svg)](https://github.com/cjnix35/overload-js/actions/workflows/test_compiling.yml)
 
@@ -22,27 +24,26 @@
 
 #### Rendering libraries
 
-- [Linux](https://github.com/torvalds/linux) -- [WebKitGTK](https://webkitgtk.org/)
-- Windows -- [Microsoft Edge WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/)
-- MacOS -- [Apple WebKit2](https://webkit.org/)
+- [Linux](https://github.com/torvalds/linux) - [WebKitGTK](https://webkitgtk.org/)
+- Windows - [Microsoft Edge WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/)
+- MacOS - [Apple WebKit2](https://webkit.org/)
 
 #### Frameworks and Libraries
 
 - [React.js](https://reactjs.org/)
-- [JSON C++ lib -- nlohmann::json](https://github.com/nlohmann/json)
+- [JSON C++ lib - nlohmann::json](https://github.com/nlohmann/json)
 - [Tailwind CSS](https://tailwindcss.com/)
 - C++ 17
 
 #### Build tools
 
-- [Webpack](https://webpack.js.org/)
+- [Vite](https://vitejs.dev/)
 - [CMake](https://cmake.org/)
-- [Babel](https://babeljs.io/)
 
 #### Code prettifiers
 
-- C++ -- [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html)
-- JS/TS and other -- [Prettier](https://prettier.io/)
+- C++ - [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html)
+- JS/TS and other - [Prettier](https://prettier.io/)
 
 ## Installation
 
