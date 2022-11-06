@@ -180,32 +180,32 @@ namespace api {
 
     std::string GetTotalPhysicalMemory(std::string args) {
 
-        return "\"Memory library is not supported on MacOS.\"";
+        return api::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetPhysicalMemoryUsage(std::string args) {
 
-        return "\"Memory library is not supported on MacOS.\"";
+        return api::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetProcPhysMemoryUsage(std::string args) {
 
-        return "\"Memory library is not supported on MacOS.\"";
+        return api::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetTotalVirtualMemory(std::string args) {
 
-        return "\"Memory library is not supported on MacOS.\"";
+        return api::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetVirtualMemoryUsage(std::string args) {
 
-        return "\"Memory library is not supported on MacOS.\"";
+        return api::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetProcVirtualMemoryUsage(std::string args) {
 
-        return "\"Memory library is not supported on MacOS.\"";
+        return api::Quotes("Memory library is not supported on MacOS.");
     }
 
 

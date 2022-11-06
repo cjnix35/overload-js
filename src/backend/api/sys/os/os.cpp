@@ -51,7 +51,7 @@ namespace api {
         stream << dwMajorVersion << "." << dwMinorVersion << " (" << dwBuild
                << ")";
 
-        return "\"Windows " + stream.str() + "\"";
+        return api::Quotes("Windows " + stream.str());
     }
 
 
@@ -71,8 +71,8 @@ namespace api {
             exit(EXIT_FAILURE);
         }
 
-        return "\"" + std::string(buffer.sysname) + " (" +
-               std::string(buffer.release) + ")\"";
+        return api::Quotes(std::string(buffer.sysname) + " (" +
+                           std::string(buffer.release) + ")");
     }
 
 

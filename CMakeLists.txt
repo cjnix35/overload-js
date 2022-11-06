@@ -70,6 +70,7 @@ add_library(overcpu "$CACHE{API_PATH}/sys/hardware/cpu.cpp")
 add_library(overdisplay "$CACHE{API_PATH}/sys/hardware/display.cpp")
 add_library(overmem "$CACHE{API_PATH}/sys/hardware/mem.cpp")
 add_library(overos "$CACHE{API_PATH}/sys/os/os.cpp")
+add_library(misc "$CACHE{API_PATH}/misc.cpp")
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
@@ -82,7 +83,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 	set(CMAKE_EXE_LINKER_FLAGS "-framework CoreFoundation -framework WebKit -framework CoreServices -framework CoreGraphics")  
 endif()
 
-target_link_libraries(main PUBLIC overfs overcpu overdisplay overmem overos)
+target_link_libraries(main PUBLIC misc overfs overcpu overdisplay overmem overos)
 
 target_compile_features(main PUBLIC cxx_std_17)
 set_target_properties(main PROPERTIES CXX_EXTENSIONS OFF)

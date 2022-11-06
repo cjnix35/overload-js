@@ -17,7 +17,7 @@ namespace api {
                    WEBVIEW_HINT_NONE);
 
 
-        return "\"true\"";
+        return JTrue;
     }
 
     std::string SetWindowTitle(std::string args) {
@@ -26,14 +26,14 @@ namespace api {
 
         w.set_title(title[0].get<std::string>());
 
-        return "\"true\"";
+        return JTrue;
     }
 
     std::string CloseWindow(std::string args) noexcept {
 
         w.terminate();
 
-        return "";
+        return JNoRet;
     }
 
 

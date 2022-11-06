@@ -3,6 +3,7 @@
 #include "webview.h"
 #include "json.hpp"
 
+#include "misc.hpp"
 #include "window/window.hpp"
 #include "filesystem/fs.hpp"
 #include "sys/os/os.hpp"
@@ -35,7 +36,7 @@ namespace api {
         {"sys_cpuModel", api::CPUModel},
         {"sys_displaySize", api::GetDisplaySize},
         {"sys_totalPhysMemory", api::GetTotalPhysicalMemory},
-        {"sys_PhysMemoryUsage", api::GetPhysicalMemoryUsage},
+        {"sys_physMemoryUsage", api::GetPhysicalMemoryUsage},
         {"sys_procPhysMemoryUsage", api::GetProcPhysMemoryUsage},
         {"sys_totalVirtualMemory", api::GetTotalVirtualMemory},
         {"sys_virtualMemoryUsage", api::GetVirtualMemoryUsage},
@@ -49,7 +50,7 @@ namespace api {
 
         std::thread(api::Functions[FunctionName], std::move(j.dump())).detach();
 
-        return "";
+        return JNoRet;
     }
 
     std::string AsyncCPP(std::string args) {
@@ -157,7 +158,7 @@ namespace api {
         // Doesn't take any arguments. Returns how much physical memory is
         // currently in use
         // JS: function sys_totalPhysMemoryUsage()
-        w.bind("sys_PhysMemoryUsage", api::GetPhysicalMemoryUsage);
+        w.bind("sys_physMemoryUsage", api::GetPhysicalMemoryUsage);
 
         // Doesn't take any arguments. Returns how much physical memory is
         // currently in use by this process

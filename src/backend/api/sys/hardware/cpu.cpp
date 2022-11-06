@@ -20,7 +20,7 @@ namespace api {
         if (RegQueryValueExA(hkey, "~MHz", nullptr, nullptr,
                              static_cast<LPBYTE>(static_cast<void*>(&freq_mhz)),
                              &freq_mhz_len))
-            return "";
+            return JNoRet;
 
         return std::to_string(freq_mhz);
     }
@@ -44,12 +44,12 @@ namespace api {
     }
 
     std::string CPUVendor(std::string args) {
-        return "\"" + CentralProcessorSubkey<12 + 1>("VendorIdentifier") + "\"";
+        return api::Quotes(CentralProcessorSubkey<12 + 1>("VendorIdentifier"));
     }
 
     std::string CPUModel(std::string args) {
-        return "\"" + CentralProcessorSubkey<64 + 1>("ProcessorNameString") +
-               "\"";
+        return api::Quotes(
+            CentralProcessorSubkey<64 + 1>("ProcessorNameString"));
     }
 
 
@@ -75,7 +75,7 @@ namespace api {
             }
         }
 
-        return "";
+        return JNoRet;
     }
 
     static std::string cpuinfo_value(const char* key) {
@@ -91,16 +91,16 @@ namespace api {
                     return line.c_str() + nonspace_id;
                 }
         }
-        return "";
+        return JNoRet;
     }
 
 
     std::string CPUVendor(std::string args) {
-        return "\"" + cpuinfo_value("vendor") + "\"";
+        return api::Quotes(cpuinfo_value("vendor"));
     }
 
     std::string CPUModel(std::string args) {
-        return "\"" + cpuinfo_value("model name") + "\"";
+        return api::Quotes(cpuinfo_value("model name"));
     }
 
 
@@ -128,11 +128,11 @@ namespace api {
     }
 
     std::string CPUVendor(std::string args) {
-        return "\"" + sysctl_value("vendor") + "\"";
+        return api::Quotes(sysctl_value("vendor"));
     }
 
     std::string CPUModel(std::string args) {
-        return "\"" + sysctl_value("brand_string") + "\"";
+        return api::Quotes(sysctl_value("brand_string"));
     }
 
 
