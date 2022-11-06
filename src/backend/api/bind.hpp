@@ -108,6 +108,19 @@ namespace api {
         // JS: function fs_removeFile(filename)
         w.bind("fs_removeFile", api::RemoveFile);
 
+        // Do the same as function above, but can delete directory with files
+        // JS: function fs_removeDir(dirname)
+        w.bind("fs_removeDir", api::RemoveDirectory);
+
+        // Takes directory as argument. Lists directory and returns array of
+        // files
+        // JS: function fs_listDir(dirname)
+        w.bind("fs_listDir", api::ListDirectory);
+
+        // Takes relative path as argument. Converts relative path to absolute
+        // JS: function fs_absolutePath(path)
+        w.bind("fs_absolutePath", api::AbsolutePath);
+
         // Doesn't take any arguments. Returns system version, for example:
         // Linux (6.0.6-arch1-1)
         // JS: function sys_version()
