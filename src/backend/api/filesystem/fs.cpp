@@ -74,5 +74,33 @@ namespace api {
         return std::filesystem::remove(filename) ? "\"true\"" : "\"false\"";
     }
 
+    std::string RemoveDirectory(std::string args) {
+
+        json arr = json::parse(args);
+        std::string dirname = arr[0].get<std::string>();
+
+        return std::filesystem::remove_all(dirname) ? "\"true\"" : "\"false\"";
+    }
+
+    std::string ListDirectory(std::string args) {
+
+        json arr = json::parse(args);
+        json ret;
+        std::string dirname = arr[0].get<std::string>();
+
+        for (const auto& entry : std::filesystem::directory_iterator(dirname))
+            ret.push_back(entry.path());
+
+        return ret.dump();
+    }
+
+    std::string AbsolutePath(std::string args) {
+
+        json arr = json::parse(args);
+        std::string path = arr[0].get<std::string>();
+
+        return "\"" + std::filesystem::absolute(path).u8string() + "\"";
+    }
+
 
 }; // namespace api
