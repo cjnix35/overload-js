@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../json.hpp"
+#include "../../constants.hpp"
 
 using json = nlohmann::json;
 

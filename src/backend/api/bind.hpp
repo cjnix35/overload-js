@@ -3,6 +3,7 @@
 #include "webview.h"
 #include "json.hpp"
 
+#include "constants.hpp"
 #include "window/window.hpp"
 #include "filesystem/fs.hpp"
 #include "sys/os/os.hpp"
@@ -49,7 +50,7 @@ namespace api {
 
         std::thread(api::Functions[FunctionName], std::move(j.dump())).detach();
 
-        return "";
+        return JNoRet;
     }
 
     std::string AsyncCPP(std::string args) {
