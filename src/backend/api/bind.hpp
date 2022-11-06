@@ -19,11 +19,14 @@ namespace api {
     std::map<std::string, FnPtr> Functions = {
         {"win_closeWindow", api::CloseWindow},
 
-        {"fs_makeDir", api::MakeDirectory},
+        {"fs_makeDir", api::MakeDir},
         {"fs_readFile", api::ReadFile},
         {"fs_writeFile", api::WriteFile},
         {"fs_appendFile", api::AppendFile},
         {"fs_removeFile", api::RemoveFile},
+        {"fs_removeDir", api::RemoveDir},
+        {"fs_listDir", api::ListDir},
+        {"fs_absolutePath", api::AbsolutePath},
 
         {"sys_version", api::Version},
         {"sys_platform", api::Platform},
@@ -89,7 +92,7 @@ namespace api {
 
         // Takes as argument path where dir has to be created
         // JS: function fs_makeDir(path)
-        w.bind("fs_makeDir", api::MakeDirectory);
+        w.bind("fs_makeDir", api::MakeDir);
 
         // Takes path to file as argument and reads file
         // JS: function fs_readFile(filename)
@@ -110,12 +113,12 @@ namespace api {
 
         // Do the same as function above, but can delete directory with files
         // JS: function fs_removeDir(dirname)
-        w.bind("fs_removeDir", api::RemoveDirectory);
+        w.bind("fs_removeDir", api::RemoveDir);
 
         // Takes directory as argument. Lists directory and returns array of
         // files
         // JS: function fs_listDir(dirname)
-        w.bind("fs_listDir", api::ListDirectory);
+        w.bind("fs_listDir", api::ListDir);
 
         // Takes relative path as argument. Converts relative path to absolute
         // JS: function fs_absolutePath(path)
