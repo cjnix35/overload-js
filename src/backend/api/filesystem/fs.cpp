@@ -3,7 +3,7 @@
 namespace api {
 
 
-    std::string MakeDirectory(std::string args) {
+    std::string MakeDir(std::string args) {
 
         json arr = json::parse(args);
         std::string path = arr[0].get<std::string>();
@@ -74,7 +74,7 @@ namespace api {
         return std::filesystem::remove(filename) ? "\"true\"" : "\"false\"";
     }
 
-    std::string RemoveDirectory(std::string args) {
+    std::string RemoveDir(std::string args) {
 
         json arr = json::parse(args);
         std::string dirname = arr[0].get<std::string>();
@@ -82,7 +82,7 @@ namespace api {
         return std::filesystem::remove_all(dirname) ? "\"true\"" : "\"false\"";
     }
 
-    std::string ListDirectory(std::string args) {
+    std::string ListDir(std::string args) {
 
         json arr = json::parse(args);
         json ret;
