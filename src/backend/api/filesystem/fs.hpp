@@ -16,6 +16,9 @@ namespace api {
     std::string WriteFile(std::string args);
     std::string AppendFile(std::string args);
     std::string RemoveFile(std::string args);
+    std::string RemoveDirectory(std::string args);
+    std::string ListDirectory(std::string args);
+    std::string AbsolutePath(std::string args);
 
 
 }; // namespace api
