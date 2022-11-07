@@ -77,6 +77,17 @@ namespace api {
         return "";
     }
 
+    std::string Import(std::string args) {
+
+        json JFunc = json::parse(args);
+
+        std::string Func = JFunc[0].get<std::string>();
+
+        w.bind(Func, Functions[Func]);
+
+        return JNoRet;
+    }
+
     void BindInit() noexcept {
 
         // Takes 2 arguments and resizes window
@@ -90,6 +101,26 @@ namespace api {
         // Doesn't take anything as argument. Simply closes the application
         // JS: function win_closeWindow()
         w.bind("win_closeWindow", api::CloseWindow);
+
+        // Takes as argument function name (first argument) and any arguments
+        // that is necessary for function
+        // JS: function asyncWithoutValue()
+        w.bind("asyncWithoutValue", api::AsyncWithoutValueCPP);
+
+        // Takes as argument function name (first argument), all arguments
+        // necessary for this function and variable name (last argument)
+        // JS: function asyncWithValue()
+        w.bind("asyncWithValue", api::AsyncCPP);
+
+        // Takes as argument function name and binds it to JS
+        // JS: function importFromCXX()
+        w.bind("importFromCXX", api::Import);
+    }
+
+}; // namespace api
+
+
+/*
 
         // Takes as argument path where dir has to be created
         // JS: function fs_makeDir(path)
@@ -180,15 +211,4 @@ namespace api {
         // JS: function sys_procVirtualMemoryUsage()
         w.bind("sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage);
 
-        // Takes as argument function name (first argument) and any arguments
-        // that is necessary for function
-        // JS: function asyncWithoutValue()
-        w.bind("asyncWithoutValue", api::AsyncWithoutValueCPP);
-
-        // Takes as argument function name (first argument), all arguments
-        // necessary for this function and variable name (last argument)
-        // JS: function asyncWithValue()
-        w.bind("asyncWithValue", api::AsyncCPP);
-    }
-
-}; // namespace api
+*/
