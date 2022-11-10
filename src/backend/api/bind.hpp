@@ -1,7 +1,9 @@
 #pragma once
 
 #include "webview.h"
-#include "json.hpp"
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 #include "misc.hpp"
 #include "window/window.hpp"
@@ -11,8 +13,10 @@
 #include "sys/hardware/display.hpp"
 #include "sys/hardware/mem.hpp"
 
+#include <iostream>
+
 extern webview::webview w;
-using json = nlohmann::json;
+using namespace rapidjson;
 
 namespace api {
 
@@ -44,11 +48,19 @@ namespace api {
 
     std::string AsyncWithoutValueCPP(std::string args) {
 
-        json j = json::parse(args);
-        std::string FunctionName = j[0].get<std::string>();
-        j.erase(j.begin());
+        Document d;
+        d.Parse(args.c_str());
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
 
-        std::thread(api::Functions[FunctionName], std::move(j.dump())).detach();
+        std::string Func = d[0].GetString();
+        d.Erase(d.Begin());
+
+        d.Accept(writer);
+
+        args = buffer.GetString();
+
+        std::thread(api::Functions[Func], args).detach();
 
         return JNoRet;
     }
@@ -62,26 +74,34 @@ namespace api {
         };
 
 
-        json j = json::parse(args);
-        std::string FunctionName = j[0].get<std::string>();
-        std::string VariableName = j[j.size() - 1].get<std::string>();
-        j.erase(j.begin());
-        j.erase(j.end());
+        Document d;
+        d.Parse(args.c_str());
 
-        std::promise<std::string> promise;
-        auto future = promise.get_future();
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+
+        std::string FunctionName = d[0].GetString();
+        std::string VariableName = d[d.Size() - 1].GetString();
+
+        d.Erase(d.Begin());
+        d.Erase(d.End() - 1);
+        d.Accept(writer);
+
+        args = buffer.GetString();
+
         std::thread(lambda, std::move(FunctionName), std::move(VariableName),
-                    std::move(j.dump()))
+                    std::move(args))
             .detach();
 
-        return "";
+        return JNoRet;
     }
 
     std::string Import(std::string args) {
 
-        json JFunc = json::parse(args);
+        Document d;
+        d.Parse(args.c_str());
 
-        std::string Func = JFunc[0].get<std::string>();
+        std::string Func = d[0].GetString();
 
         w.bind(Func, Functions[Func]);
 

@@ -1,10 +1,5 @@
 #pragma once
 
-#include "../../json.hpp"
-
-using json = nlohmann::json;
-
-
 #ifdef _WIN32
 
 #include <wtypes.h>
@@ -18,6 +13,8 @@ using json = nlohmann::json;
 #include <CoreGraphics/CGDisplayConfiguration.h>
 
 #endif
+
+#include "../../misc.hpp"
 
 namespace api {
 

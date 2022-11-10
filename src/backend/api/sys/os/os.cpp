@@ -6,15 +6,15 @@ namespace api {
     std::string Platform(std::string args) {
 
 #ifdef _WIN32
-        return "\"windows\"";
+        return api::Quotes("windows");
 #elif __APPLE__ || __MACH__
-        return "\"macos\"";
+        return api::Quotes("darwin");
 #elif __linux__
-        return "\"linux\"";
+        return api::Quotes("linux");
 #elif __FreeBSD__
-        return "\"freebsd\"";
+        return api::Quotes("freebsd");
 #else
-        return "\"other\"";
+        return api::Quotes("other");
 #endif
     }
 

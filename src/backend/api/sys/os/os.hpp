@@ -1,11 +1,8 @@
 #pragma once
 
-#include "../../json.hpp"
 #include "../../misc.hpp"
 
 #include <sstream>
-
-using json = nlohmann::json;
 
 namespace api {
 

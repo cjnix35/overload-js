@@ -1,11 +1,5 @@
-#include <fstream>
-#include <cstdlib>
-#include <iostream>
-
-#include "../api/json.hpp"
 #include "../api/webview.h"
 
-using json = nlohmann::json;
 
 // If you want to compile production build, change 'true' on 'false'
 const bool DEBUG = true;
