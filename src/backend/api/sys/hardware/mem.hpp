@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../../json.hpp"
 #include "../../misc.hpp"
 
-using json = nlohmann::json;
+#include <cstring>
 
 #ifdef _WIN32
 

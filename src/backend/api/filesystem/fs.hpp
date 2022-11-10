@@ -4,9 +4,13 @@
 #include <fstream>
 #include <sstream>
 
-#include "../json.hpp"
+#include "../rapidjson/document.h"
+#include "../rapidjson/writer.h"
+#include "../rapidjson/stringbuffer.h"
 
-using json = nlohmann::json;
+#include "../misc.hpp"
+
+using namespace rapidjson;
 
 namespace api {
 

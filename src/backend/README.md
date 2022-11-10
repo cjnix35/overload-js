@@ -24,8 +24,8 @@ On Linux, you need `webkit2gtk-4.0` to compile this project. On MacOS, you need 
 ```
 mkdir build
 cd build
-cmake ..
-make -j4
+cmake -GNinja ..
+ninja -j 16
 ```
 ### Windows
 On Windows, Visual Studio 2022 and above are supported. You also need `nuget` package manager set in `$PATH` environment:
