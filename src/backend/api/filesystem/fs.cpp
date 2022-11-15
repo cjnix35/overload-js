@@ -65,6 +65,7 @@ namespace api {
     std::string AppendFile(std::string args) {
 
         Document d;
+        d.Parse(args.c_str());
         std::string filename = d[0].GetString();
 
         std::ofstream f(filename, std::ios_base::app);
