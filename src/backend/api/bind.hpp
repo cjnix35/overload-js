@@ -13,8 +13,6 @@
 #include "sys/hardware/display.hpp"
 #include "sys/hardware/mem.hpp"
 
-#include <iostream>
-
 extern webview::webview w;
 using namespace rapidjson;
 
@@ -96,18 +94,6 @@ namespace api {
         return JNoRet;
     }
 
-    std::string Import(std::string args) {
-
-        Document d;
-        d.Parse(args.c_str());
-
-        std::string Func = d[0].GetString();
-
-        w.bind(Func, Functions[Func]);
-
-        return JNoRet;
-    }
-
     void BindInit() noexcept {
 
         // Takes 2 arguments and resizes window
@@ -131,16 +117,6 @@ namespace api {
         // necessary for this function and variable name (last argument)
         // JS: function asyncWithValue()
         w.bind("asyncWithValue", api::AsyncCPP);
-
-        // Takes as argument function name and binds it to JS
-        // JS: function importFromCXX()
-        w.bind("importFromCXX", api::Import);
-    }
-
-}; // namespace api
-
-
-/*
 
         // Takes as argument path where dir has to be created
         // JS: function fs_makeDir(path)
@@ -230,5 +206,6 @@ namespace api {
         // currently in use by this process
         // JS: function sys_procVirtualMemoryUsage()
         w.bind("sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage);
+    }
 
-*/
+}; // namespace api
