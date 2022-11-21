@@ -4,7 +4,7 @@
 
 namespace api {
 
-    std::string Quotes(std::string args);
+    std::string Quotes(std::string args) noexcept;
 
     constexpr auto JTrue = "\"true\"";
     constexpr auto JFalse = "\"false\"";
