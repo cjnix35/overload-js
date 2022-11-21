@@ -43,7 +43,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if (UNIX)
-        add_compile_options(-Ofast)
+        add_compile_options(-Ofast -fno-exceptions)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -90,5 +90,5 @@ set_target_properties(main PROPERTIES CXX_EXTENSIONS OFF)
 target_include_directories(main PUBLIC ${BACKEND_PATH})
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread)
+        target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread -larchive)
 endif()
