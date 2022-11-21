@@ -44,7 +44,7 @@ namespace api {
         {"sys_virtualMemoryUsage", api::GetVirtualMemoryUsage},
         {"sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage}};
 
-    std::string AsyncWithoutValueCPP(std::string args) {
+    static std::string AsyncWithoutValueCPP(std::string args) {
 
         Document d;
         d.Parse(args.c_str());
@@ -63,7 +63,7 @@ namespace api {
         return JNoRet;
     }
 
-    std::string AsyncCPP(std::string args) {
+    static std::string AsyncCPP(std::string args) {
 
         const auto lambda = [](std::string function, std::string var,
                                std::string args) -> void {
