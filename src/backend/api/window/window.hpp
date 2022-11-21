@@ -14,11 +14,6 @@ namespace api {
 
     std::string SetWindowSize(std::string args) {
 
-        // json arr = json::parse(args);
-
-        // w.set_size(arr[0].get<std::uint16_t>(), arr[1].get<std::uint16_t>(),
-        //            WEBVIEW_HINT_NONE);
-
         Document d;
         d.Parse(args.c_str());
 
