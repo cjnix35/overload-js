@@ -1432,7 +1432,6 @@ namespace webview {
                     resize(m_window);
                     m_controller->MoveFocus(
                         COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC);
-
                 }
 
                 virtual ~win32_edge_engine() {
@@ -1567,8 +1566,12 @@ namespace webview {
                             flag.clear();
                         });
 
-auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
-options->put_AdditionalBrowserArguments(L"--allow-file-access-from-files --allow-http-screen-capture --allow-cross-origin-auth-prompt");
+                    auto options =
+                        Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+                    options->put_AdditionalBrowserArguments(
+                        L"--allow-file-access-from-files "
+                        L"--allow-http-screen-capture "
+                        L"--allow-cross-origin-auth-prompt");
 
 
                     HRESULT res = CreateCoreWebView2EnvironmentWithOptions(
