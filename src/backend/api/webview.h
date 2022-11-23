@@ -1073,6 +1073,7 @@ namespace webview {
 #include <windows.h>
 
 #include "WebView2.h"
+#include <WebView2EnvironmentOptions.h>
 
 #ifdef _MSC_VER
 #pragma comment(lib, "ole32.lib")
@@ -1431,6 +1432,7 @@ namespace webview {
                     resize(m_window);
                     m_controller->MoveFocus(
                         COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC);
+
                 }
 
                 virtual ~win32_edge_engine() {
@@ -1564,8 +1566,13 @@ namespace webview {
                             m_webview = webview;
                             flag.clear();
                         });
+
+auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+options->put_AdditionalBrowserArguments(L"--allow-file-access-from-files --allow-http-screen-capture --allow-cross-origin-auth-prompt");
+
+
                     HRESULT res = CreateCoreWebView2EnvironmentWithOptions(
-                        nullptr, userDataFolder, nullptr, m_com_handler);
+                        nullptr, userDataFolder, options.Get(), m_com_handler);
                     if (res != S_OK) { return false; }
                     MSG msg = {};
                     while (flag.test_and_set() &&
