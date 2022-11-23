@@ -13,10 +13,11 @@
 
 #include "../../def.hpp"
 
-#include <archive.h>
-#include <archive_entry.h>
+#define LIBARCHIVE_STATIC
+#include "archive.h"
+#include "archive_entry.h"
 
-#ifdef __linux__ //|| (__APPLE__ && __MACH__)
+#ifdef __linux__
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
