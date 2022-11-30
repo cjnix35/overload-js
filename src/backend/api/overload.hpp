@@ -99,9 +99,9 @@ namespace api {
     }
     void OverApp::navigate_resource(const std::string res) {
 
-        w.navigate(
-            "file://" +
-            std::filesystem::absolute("." APP_INTERNAL_NAME + res).u8string());
+        w.navigate("file://" +
+                   std::filesystem::absolute("." APP_INTERNAL_NAME "/" + res)
+                       .u8string());
     }
 
     void OverApp::eval(const std::string js) {
