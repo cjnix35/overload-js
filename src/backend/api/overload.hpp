@@ -32,7 +32,6 @@ namespace api {
             std::string AsyncCPP(std::string args);
             webview::webview w;
 
-
         public:
             OverApp(bool debug = false, void *winptr = nullptr)
                 : w(debug, winptr) {
@@ -51,6 +50,14 @@ namespace api {
             void terminate() noexcept;
             void *window();
             void dispatch(std::function<void()> f);
+
+            void LoadResourcesFromFile(std::string filename);
+            void LoadResourcesFromMemory(std::uint8_t *buf,
+                                         std::uint64_t *buf_len);
+            // std::string ResourcePath(std::string
+            // res_name); Resource
+            // GetResourceContent(std::string
+            // res_name);
 
             bool set_signal(std::string signal, std::function<void()> f);
             // For C++
@@ -166,6 +173,18 @@ namespace api {
 
         return JNoRet;
     }
+
+    void OverApp::LoadResourcesFromMemory(std::uint8_t *buf,
+                                          std::uint64_t *buf_len) {
+
+        // w.load_resource_mem(buf, buf_len);
+    }
+
+    void OverApp::LoadResourcesFromFile(std::string filename) {
+
+        load_resource_file(filename);
+    }
+
 
     typedef std::string (*FnPtr)(std::string);
     std::map<std::string, FnPtr> Functions = {
