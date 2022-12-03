@@ -13,10 +13,6 @@
 
 #include "../../def.hpp"
 
-#define LIBARCHIVE_STATIC
-#include "archive.h"
-#include "archive_entry.h"
-
 #ifdef __linux__
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -44,12 +40,12 @@ namespace api {
     std::string ListDir(std::string args);
     std::string AbsolutePath(std::string args);
 
-    static int copy_data(struct archive *ar, struct archive *aw);
-    static int extract_file(const char *filename);
-    static int extract_mem(std::uint8_t *buf, std::uint64_t buf_len);
+    // static int copy_data(struct archive *ar, struct archive *aw);
+    // static int extract_file(const char *filename);
+    // static int extract_mem(std::uint8_t *buf, std::uint64_t buf_len);
 
-    bool LoadResourcesFromFile(std::string filename);
-    bool LoadResourcesFromMemory(std::uint8_t *buf, std::uint64_t *buf_len);
+    // bool LoadResourcesFromFile(std::string filename);
+    // bool LoadResourcesFromMemory(std::uint8_t *buf, std::uint64_t *buf_len);
     std::string ResourcePath(std::string res_name);
     Resource GetResourceContent(std::string res_name);
 
