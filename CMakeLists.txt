@@ -66,16 +66,6 @@ if(result)
         set_target_properties(main PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-FetchContent_Declare(
-  libarchive
-  GIT_REPOSITORY https://github.com/libarchive/libarchive.git
-  GIT_TAG        v3.6.1
-)
-
-FetchContent_MakeAvailable(libarchive)
-endif()
-
 add_library(overfs "$CACHE{API_PATH}/filesystem/fs.cpp")
 add_library(overcpu "$CACHE{API_PATH}/sys/hardware/cpu.cpp")
 add_library(overdisplay "$CACHE{API_PATH}/sys/hardware/display.cpp")
@@ -87,13 +77,11 @@ add_library(misc "$CACHE{API_PATH}/misc.cpp")
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
 	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
-        target_link_libraries(overfs PRIVATE ../bin/dynamic/archive)
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         add_library(overdarwin "$CACHE{API_PATH}/sys/os/darwin.cpp")
         target_link_libraries(main PUBLIC overdarwin)
-        target_link_libraries(overfs PRIVATE archive_static)
 	set(CMAKE_EXE_LINKER_FLAGS "-framework CoreFoundation -framework WebKit -framework CoreServices -framework CoreGraphics")  
 endif()
 
@@ -105,5 +93,4 @@ target_include_directories(main PUBLIC ${BACKEND_PATH})
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread)
-        target_link_libraries(overfs PRIVATE archive_static)
 endif()
