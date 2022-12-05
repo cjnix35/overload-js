@@ -36,3 +36,24 @@ cmake ..
 msbuild overload_js.sln -m /property:Configuration=Release
 ```
 Congratulations! You've built overload.js.
+
+## How to use
+In development, you may want to use development server for frontend. For this, you can simply use
+```
+app.navigate_url("http://localhost:8080/");
+```
+If you want to navigate to file, simply use
+```
+app.navigate_file("/path/to/file");
+```
+When building production build, you have to pack your `dist` folder into `asar` archive
+```
+npm run build
+asar pack dist app.asar
+mv app.asar build/app.asar
+```
+Note that you have to install `asar` utility first. After that, you have to create header that contains all the data from that archive using utility like `xxd`. This will create header file, that you have to include in your main .cpp file, and after that simply use
+```
+app.load_resources_from_memory(resource, &resource_len);
+app.navigate_resource("filename_from_archive");
+```
