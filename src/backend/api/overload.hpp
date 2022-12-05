@@ -106,9 +106,7 @@ namespace api {
     }
     void OverApp::navigate_resource(const std::string res) {
 
-        w.navigate("file://" +
-                   std::filesystem::absolute("." APP_INTERNAL_NAME "/" + res)
-                       .u8string());
+        w.navigate("overload:" + res);
     }
 
     void OverApp::eval(const std::string js) {
@@ -177,7 +175,7 @@ namespace api {
     void OverApp::LoadResourcesFromMemory(std::uint8_t *buf,
                                           std::uint64_t *buf_len) {
 
-        // w.load_resource_mem(buf, buf_len);
+        load_resource_mem(buf, buf_len);
     }
 
     void OverApp::LoadResourcesFromFile(std::string filename) {

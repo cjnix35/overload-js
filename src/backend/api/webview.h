@@ -160,8 +160,154 @@ WEBVIEW_API void webview_return(webview_t w, const char *seq, int status,
 #include <string>
 #include <utility>
 #include <vector>
-
 #include <cstring>
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
+
+#define CPPHTTPLIB_NO_EXCEPTIONS
+#include "httplib.h"
+
+using fs_map = std::map<std::string, std::string>;
+using fs_pair = std::pair<std::string, std::string>;
+using mime_map = std::map<std::string, std::string>;
+
+#ifdef _WIN32
+
+#include <direct.h>
+#define MKDIR(a) mkdir(a)
+#define DIR_SEPARATOR '/'
+
+#else
+
+#include <sys/stat.h>
+#define MKDIR(a) mkdir(a, 0777)
+#define DIR_SEPARATOR '/'
+
+#endif
+
+fs_map mime_type = {{"html", "text/html"},        {"htm", "text/html"},
+                    {"css", "text/css"},          {"js", "text/javascript"},
+                    {"json", "application/json"}, {"txt", "text/plain"},
+                    {"webp", "image/webp"},       {"csv", "text/csv"},
+                    {"mp4", "video/mp4"},         {"png", "image/png"},
+                    {"jpeg", "image/jpeg"},       {"jpg", "image/jpeg"},
+                    {"xml", "application/xml"}};
+
+std::ifstream m_ifsInputFile;
+size_t m_headerSize = 0;
+size_t m_szOffset = 0;
+bool m_extract = true;
+
+std::unique_ptr<fs_map> vfs = std::make_unique<fs_map>();
+
+void unpackFiles(rapidjson::Value &object, const std::string &sPath = "/") {
+
+    for (auto itr = object.MemberBegin(); itr != object.MemberEnd(); ++itr) {
+        std::string sFilePath = sPath + itr->name.GetString();
+        rapidjson::Value &vMember = itr->value;
+        if (vMember.IsObject()) {
+            if (vMember.HasMember("files")) {
+
+                unpackFiles(vMember["files"], sFilePath + DIR_SEPARATOR);
+            } else {
+                if (!(vMember.HasMember("size") &&
+                      vMember.HasMember("offset") && vMember["size"].IsInt() &&
+                      vMember["offset"].IsString()))
+                    continue;
+
+                if (!m_extract) { continue; }
+
+                size_t uSize = vMember["size"].GetUint();
+                int uOffset = std::stoi(vMember["offset"].GetString());
+
+                std::string res(uSize, ' ');
+                m_ifsInputFile.seekg(m_headerSize + uOffset);
+                m_ifsInputFile.read(&res[0], uSize);
+
+                vfs->insert(fs_pair(sFilePath, res));
+            }
+        }
+    }
+}
+
+void unpackFilesMem(rapidjson::Value &object, std::uint8_t *buf,
+                    const std::string &sPath = "/") {
+
+    for (auto itr = object.MemberBegin(); itr != object.MemberEnd(); ++itr) {
+        std::string sFilePath = sPath + itr->name.GetString();
+        rapidjson::Value &vMember = itr->value;
+        if (vMember.IsObject()) {
+            if (vMember.HasMember("files")) {
+
+                unpackFilesMem(vMember["files"], buf,
+                               sFilePath + DIR_SEPARATOR);
+            } else {
+                if (!(vMember.HasMember("size") &&
+                      vMember.HasMember("offset") && vMember["size"].IsInt() &&
+                      vMember["offset"].IsString()))
+                    continue;
+
+                if (!m_extract) { continue; }
+
+                size_t uSize = vMember["size"].GetUint();
+                int uOffset = std::stoi(vMember["offset"].GetString());
+
+                std::string res(uSize, ' ');
+                memcpy(&res[0], buf + (m_headerSize + uOffset), uSize);
+
+                vfs->insert(fs_pair(sFilePath, res));
+            }
+        }
+    }
+}
+
+bool load_resource_mem(std::uint8_t *buf, std::uint64_t *buf_len) {
+
+    char sizeBuf[8];
+    memcpy(sizeBuf, buf, 8);
+    uint32_t uSize = *(uint32_t *)(sizeBuf + 4) - 8;
+
+    m_headerSize = uSize + 16;
+    char headerBuf[uSize + 1];
+    memcpy(headerBuf, buf + 16, uSize);
+    headerBuf[uSize] = 0;
+
+    rapidjson::Document json;
+    rapidjson::ParseResult res = json.Parse(headerBuf);
+    if (!res) { return false; }
+
+    unpackFilesMem(json["files"], buf);
+    m_szOffset = 0;
+
+    return true;
+}
+
+bool load_resource_file(const std::string &sArchivePath) {
+
+    m_ifsInputFile.open(sArchivePath, std::ios::binary);
+    if (!m_ifsInputFile) { return false; }
+
+    char sizeBuf[8];
+    m_ifsInputFile.read(sizeBuf, 8);
+    uint32_t uSize = *(uint32_t *)(sizeBuf + 4) - 8;
+
+    m_headerSize = uSize + 16;
+    char headerBuf[uSize + 1];
+    m_ifsInputFile.seekg(16);
+    m_ifsInputFile.read(headerBuf, uSize);
+    headerBuf[uSize] = 0;
+
+    rapidjson::Document json;
+    rapidjson::ParseResult res = json.Parse(headerBuf);
+    if (!res) { return false; }
+
+    unpackFiles(json["files"]);
+    m_szOffset = 0;
+
+    m_ifsInputFile.close();
+
+    return true;
+}
 
 namespace webview {
 
@@ -407,7 +553,6 @@ namespace webview {
 
 #include <unistd.h>
 
-
 static gboolean decide_policy_cb(WebKitWebView *web_view,
                                  WebKitPolicyDecision *decision,
                                  WebKitPolicyDecisionType type) {
@@ -452,11 +597,65 @@ static gboolean decide_policy_cb(WebKitWebView *web_view,
     return true;
 }
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+void overload_embedded_scheme(WebKitURISchemeRequest *request) {
+
+    GInputStream *stream;
+    gsize stream_length;
+    char *contents;
+    const gchar *path;
+    path = webkit_uri_scheme_request_get_path(request);
+
+    if (vfs->find(path) != vfs->end()) {
+
+        std::string strpath = path;
+
+        std::string ext = strpath.substr(strpath.find_last_of(".") + 1,
+                                         strpath.length());
+
+        contents = const_cast<char *>(vfs->at(path).c_str());
+        stream_length = strlen(contents);
+        stream = g_memory_input_stream_new_from_data(contents, stream_length,
+                                                     g_free);
+
+        webkit_uri_scheme_request_finish(request, stream, stream_length,
+                                         mime_type[ext].c_str());
+
+    } else {
+
+        // httplib::Client cli("http://localhost:8080");
+
+        // auto res = cli.Get("/");
+        // res->status;
+        // res->body;
+
+        // std::cout << res->status << '\n';
+
+        // contents = const_cast<char *>(res->body.c_str());
+
+        contents = "<strong>flex</strong>";
+
+        stream_length = strlen(contents);
+        stream = g_memory_input_stream_new_from_data(contents, stream_length,
+                                                     g_free);
+
+        std::cout << "Not correct\n";
+
+        webkit_uri_scheme_request_finish(request, stream, stream_length,
+                                         "text/html");
+    }
+
+    // g_object_unref(stream);*/
+}
 
 namespace webview {
     namespace detail {
 
         class gtk_webkit_engine {
+
             public:
                 gtk_webkit_engine(bool debug, void *window)
                     : m_window(static_cast<GtkWidget *>(window)) {
@@ -496,6 +695,15 @@ namespace webview {
                     gtk_container_add(GTK_CONTAINER(m_window),
                                       GTK_WIDGET(m_webview));
                     gtk_widget_grab_focus(GTK_WIDGET(m_webview));
+
+                    WebKitWebContext *context =
+                        webkit_web_context_get_default();
+
+                    webkit_web_context_register_uri_scheme(
+                        context, "overload",
+                        (WebKitURISchemeRequestCallback)
+                            overload_embedded_scheme,
+                        NULL, NULL);
 
                     WebKitSettings *settings = webkit_web_view_get_settings(
                         WEBKIT_WEB_VIEW(m_webview));
@@ -563,8 +771,8 @@ namespace webview {
                         GdkWindowHints h = (hints == WEBVIEW_HINT_MIN ?
                                                 GDK_HINT_MIN_SIZE :
                                                 GDK_HINT_MAX_SIZE);
-                        // This defines either MIN_SIZE, or MAX_SIZE, but not
-                        // both:
+                        // This defines either MIN_SIZE, or MAX_SIZE, but
+                        // not both:
                         gtk_window_set_geometry_hints(GTK_WINDOW(m_window),
                                                       nullptr, &g, h);
                     }
@@ -1661,16 +1869,18 @@ namespace webview {
                                   bool sync = true)
                         : callback(callback), arg(arg), sync(sync) {
                     }
-                    // This function is called upon execution of the bound JS
-                    // function
+                    // This function is called upon execution of the bound
+                    // JS function
                     binding_t *callback;
                     // This user-supplied argument is passed to the callback
                     void *arg;
                     // This boolean expresses whether or not this binding is
-                    // synchronous or asynchronous Async bindings require the
-                    // user to call the resolve function, sync bindings don't
+                    // synchronous or asynchronous Async bindings require
+                    // the user to call the resolve function, sync bindings
+                    // don't
                     bool sync;
             };
+
 
             using sync_binding_t = std::function<std::string(std::string)>;
             using sync_binding_ctx_t = std::pair<webview *, sync_binding_t>;
