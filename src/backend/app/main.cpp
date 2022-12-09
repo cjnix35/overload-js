@@ -3,7 +3,7 @@
 
 overmain(argc, argv) {
 
-    api::OverApp app(DEBUG, nullptr);
+    api::OverApp app(DEBUG);
 
     app.set_title("Overload.js");
     app.set_size(1200, 700);
