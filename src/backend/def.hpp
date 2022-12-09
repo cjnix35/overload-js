@@ -4,4 +4,4 @@
 #define LICENSE "MIT"
 #define REFERENCE "https://github.com/cjnix35/overload-js"
 // If you want to compile production build, change 'true' on 'false'
-#define DEBUG true
+#define IS_DEBUG true
