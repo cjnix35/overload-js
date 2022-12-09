@@ -161,11 +161,10 @@ WEBVIEW_API void webview_return(webview_t w, const char *seq, int status,
 #include <utility>
 #include <vector>
 #include <cstring>
+#include <fstream>
+#include <sstream>
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
-
-#define CPPHTTPLIB_NO_EXCEPTIONS
-#include "httplib.h"
 
 using fs_map = std::map<std::string, std::string>;
 using fs_pair = std::pair<std::string, std::string>;
@@ -597,10 +596,6 @@ static gboolean decide_policy_cb(WebKitWebView *web_view,
     return true;
 }
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-
 void overload_embedded_scheme(WebKitURISchemeRequest *request) {
 
     GInputStream *stream;
@@ -626,26 +621,11 @@ void overload_embedded_scheme(WebKitURISchemeRequest *request) {
 
     } else {
 
-        // httplib::Client cli("http://localhost:8080");
-
-        // auto res = cli.Get("/");
-        // res->status;
-        // res->body;
-
-        // std::cout << res->status << '\n';
-
-        // contents = const_cast<char *>(res->body.c_str());
-
-        contents = "<strong>flex</strong>";
-
-        stream_length = strlen(contents);
-        stream = g_memory_input_stream_new_from_data(contents, stream_length,
-                                                     g_free);
-
-        std::cout << "Not correct\n";
-
-        webkit_uri_scheme_request_finish(request, stream, stream_length,
-                                         "text/html");
+        GError *error;
+        error = g_error_new(1, 1, "Invalid overload:%s page.", path);
+        webkit_uri_scheme_request_finish_error(request, error);
+        g_error_free(error);
+        return;
     }
 
     // g_object_unref(stream);*/
