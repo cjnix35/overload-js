@@ -48,12 +48,13 @@ namespace api {
 
         Document d;
         d.Parse(args.c_str());
-        std::string filename = d[0].GetString();
+        const auto &filename = d[0].GetString();
 
         std::ofstream f(filename, std::ios_base::trunc);
         if (f.is_open()) {
 
-            f << d[1].GetString();
+            const auto &str = d[1].GetString();
+            f.write(str, strlen(str));
             f.close();
 
             return JTrue;
@@ -65,12 +66,14 @@ namespace api {
 
         Document d;
         d.Parse(args.c_str());
-        std::string filename = d[0].GetString();
+
+        const auto &filename = d[0].GetString();
 
         std::ofstream f(filename, std::ios_base::app);
         if (f.is_open()) {
 
-            f << d[1].GetString();
+            const auto &str = d[1].GetString();
+            f.write(str, strlen(str));
             f.close();
 
             return JTrue;
@@ -122,5 +125,6 @@ namespace api {
 
         return api::Quotes(std::filesystem::absolute(args).u8string());
     }
+
 
 }; // namespace api
