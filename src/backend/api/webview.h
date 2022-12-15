@@ -672,26 +672,24 @@ static gboolean decide_policy_cb(WebKitWebView *web_view,
 
 void overload_embedded_scheme(WebKitURISchemeRequest *request) {
 
-    GInputStream *stream;
-    gsize stream_length;
-    char *contents;
-    const gchar *path;
-    path = webkit_uri_scheme_request_get_path(request);
+    const char *path = webkit_uri_scheme_request_get_path(request);
 
-    if (vfs->find(path) != vfs->end()) {
+    auto it = vfs->find(path);
+    if (it != vfs->end()) {
 
-        std::string strpath = path;
+        const std::string &strpath = it->second;
+        const char *contents = strpath.c_str();
 
-        std::string ext = strpath.substr(strpath.find_last_of(".") + 1,
-                                         strpath.length());
+        std::string ext = strpath.substr(strpath.find_last_of(".") + 1);
 
-        contents = const_cast<char *>(vfs->at(path).c_str());
-        stream_length = strlen(contents);
-        stream = g_memory_input_stream_new_from_data(contents, stream_length,
-                                                     g_free);
+        gsize stream_length = strlen(contents);
+        GInputStream *stream = g_memory_input_stream_new_from_data(
+            contents, stream_length, g_free);
 
         webkit_uri_scheme_request_finish(request, stream, stream_length,
                                          mime_type[ext].c_str());
+
+        g_object_unref(stream);
 
     } else {
 
@@ -699,10 +697,7 @@ void overload_embedded_scheme(WebKitURISchemeRequest *request) {
         error = g_error_new(1, 1, "Invalid overload:%s page.", path);
         webkit_uri_scheme_request_finish_error(request, error);
         g_error_free(error);
-        return;
     }
-
-    // g_object_unref(stream);*/
 }
 
 namespace webview {
