@@ -35,6 +35,8 @@ namespace api {
         public:
             OverApp(bool debug = false, void *winptr = nullptr)
                 : w(debug, winptr) {
+
+                this->bind_init();
             }
             void run();
 
