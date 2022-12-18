@@ -113,7 +113,9 @@ msbuild overload_js.sln -m /property:Configuration=Release
 
 ## Development
 
-Сurrently Overload.js is under development, there is still a lot of work to be done.
+#### **Overload.js is currently not ready for production use yet.**
+
+Сurrently Overload.js is under development, there is still a lot of work to be done. 
 
 Want to contribute? Great!
 
