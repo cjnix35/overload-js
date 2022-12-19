@@ -218,7 +218,7 @@ namespace api {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
 
-        std::string Func = d[0].GetString();
+        const auto &Func = d[0].GetString();
         d.Erase(d.Begin());
 
         d.Accept(writer);
@@ -245,8 +245,8 @@ namespace api {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
 
-        std::string FunctionName = d[0].GetString();
-        std::string VariableName = d[d.Size() - 1].GetString();
+        const auto &FunctionName = d[0].GetString();
+        const auto &VariableName = d[d.Size() - 1].GetString();
 
         d.Erase(d.Begin());
         d.Erase(d.End() - 1);
