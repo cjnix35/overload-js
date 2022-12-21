@@ -54,8 +54,9 @@ namespace api {
             void dispatch(std::function<void()> f);
 
             void LoadResourcesFromFile(std::string filename);
+            template <typename uint>
             void LoadResourcesFromMemory(std::uint8_t *buf,
-                                         std::uint64_t *buf_len);
+                                         uint *buf_len);
             // std::string ResourcePath(std::string
             // res_name); Resource
             // GetResourceContent(std::string
@@ -87,7 +88,7 @@ namespace api {
         w.set_title(title);
     }
 
-    void OverApp::set_size(std::uint64_t x, std::uint64_t y) {
+    void OverApp::set_size(std::uint64_t x, std::uint64_t y) noexcept {
 
         w.set_size(x, y, WEBVIEW_HINT_NONE);
     }
@@ -108,7 +109,7 @@ namespace api {
     }
     void OverApp::navigate_resource(const std::string res) {
 
-        w.navigate("overload:" + res);
+        w.navigate_res("overload:" + res);
     }
 
     void OverApp::eval(const std::string js) {
@@ -174,8 +175,9 @@ namespace api {
         return JNoRet;
     }
 
+    template <typename uint>
     void OverApp::LoadResourcesFromMemory(std::uint8_t *buf,
-                                          std::uint64_t *buf_len) {
+                                          uint *buf_len) {
 
         load_resource_mem(buf, buf_len);
     }
