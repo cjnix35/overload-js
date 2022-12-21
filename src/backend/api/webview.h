@@ -232,31 +232,44 @@ WEBVIEW_API const webview_version_info_t *webview_version();
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
 
-using fs_map = std::map<std::string, std::string>;
 using fs_pair = std::pair<std::string, std::string>;
-using mime_map = std::map<std::string, std::string>;
+using fs_map = std::map<std::string, std::string>;
 
 #ifdef _WIN32
 
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 #include <direct.h>
 #define MKDIR(a) mkdir(a)
 #define DIR_SEPARATOR '/'
 
+using mime_map = std::map<std::string, std::wstring>;
+
+mime_map mime_type = {{"html", L"text/html"},        {"htm", L"text/html"},
+                    {"css", L"text/css"},          {"js", L"text/javascript"},
+                    {"json", L"application/json"}, {"txt", L"text/plain"},
+                    {"webp", L"image/webp"},       {"csv", L"text/csv"},
+                    {"mp4", L"video/mp4"},         {"png", L"image/png"},
+                    {"jpeg", L"image/jpeg"},       {"jpg", L"image/jpeg"},
+                    {"xml", L"application/xml"}};
+
 #else
+
+using mime_map = std::map<std::string, std::string>;
 
 #include <sys/stat.h>
 #define MKDIR(a) mkdir(a, 0777)
 #define DIR_SEPARATOR '/'
 
-#endif
-
-fs_map mime_type = {{"html", "text/html"},        {"htm", "text/html"},
+mime_map mime_type = {{"html", "text/html"},        {"htm", "text/html"},
                     {"css", "text/css"},          {"js", "text/javascript"},
                     {"json", "application/json"}, {"txt", "text/plain"},
                     {"webp", "image/webp"},       {"csv", "text/csv"},
                     {"mp4", "video/mp4"},         {"png", "image/png"},
                     {"jpeg", "image/jpeg"},       {"jpg", "image/jpeg"},
                     {"xml", "application/xml"}};
+
+#endif
 
 std::ifstream m_ifsInputFile;
 size_t m_headerSize = 0;
@@ -326,14 +339,15 @@ void unpackFilesMem(rapidjson::Value &object, std::uint8_t *buf,
     }
 }
 
-bool load_resource_mem(std::uint8_t *buf, std::uint64_t *buf_len) {
+template <typename uint>
+bool load_resource_mem(std::uint8_t *buf, uint *buf_len) {
 
     char sizeBuf[8];
     memcpy(sizeBuf, buf, 8);
     uint32_t uSize = *(uint32_t *)(sizeBuf + 4) - 8;
 
     m_headerSize = uSize + 16;
-    char headerBuf[uSize + 1];
+    char *headerBuf = new char[uSize + 1];
     memcpy(headerBuf, buf + 16, uSize);
     headerBuf[uSize] = 0;
 
@@ -343,6 +357,8 @@ bool load_resource_mem(std::uint8_t *buf, std::uint64_t *buf_len) {
 
     unpackFilesMem(json["files"], buf);
     m_szOffset = 0;
+
+    delete headerBuf;
 
     return true;
 }
@@ -357,7 +373,7 @@ bool load_resource_file(const std::string &sArchivePath) {
     uint32_t uSize = *(uint32_t *)(sizeBuf + 4) - 8;
 
     m_headerSize = uSize + 16;
-    char headerBuf[uSize + 1];
+    char *headerBuf = new char[uSize + 1];
     m_ifsInputFile.seekg(16);
     m_ifsInputFile.read(headerBuf, uSize);
     headerBuf[uSize] = 0;
@@ -370,6 +386,8 @@ bool load_resource_file(const std::string &sArchivePath) {
     m_szOffset = 0;
 
     m_ifsInputFile.close();
+
+    delete headerBuf;
 
     return true;
 }
@@ -1368,6 +1386,22 @@ namespace webview {
 
 #include "WebView2.h"
 #include <WebView2EnvironmentOptions.h>
+#include "WebView2Experimental.h"
+#include "WebView2ExperimentalEnvironmentOptions.h"
+
+#include <atlstr.h>
+#include <wil/com.h>
+#include <wrl/wrappers/corewrappers.h>
+#include <wil/winrt.h>
+#include <wrl/implements.h>
+#include <wil/resource.h>
+#include <wil/result.h>
+#include <wil/win32_helpers.h>
+
+using namespace Microsoft::WRL;
+using namespace Microsoft::WRL::Wrappers;
+
+#include <iostream>
 
 #ifdef _MSC_VER
 #pragma comment(lib, "ole32.lib")
@@ -1375,6 +1409,8 @@ namespace webview {
 #pragma comment(lib, "shlwapi.lib")
 #pragma comment(lib, "user32.lib")
 #endif
+
+#define CHECK_FAILURE
 
 namespace webview {
     namespace detail {
@@ -1816,6 +1852,21 @@ namespace webview {
                     auto wurl = widen_string(url);
                     m_webview->Navigate(wurl.c_str());
                 }
+                void navigate_res(const std::string &url) {
+
+                    auto it = vfs->find(url.substr(url.find_last_of(':') + 1));
+                    if (it != vfs->end()) {
+
+                        auto content = widen_string(it->second);
+                        m_webview->NavigateToString(content.c_str());
+
+                    } else {
+
+                        m_webview->Navigate(L"about:blank");
+
+                    }
+
+                }
 
                 void init(const std::string &js) {
                     auto wjs = widen_string(js);
@@ -1862,11 +1913,13 @@ namespace webview {
 
                     auto options =
                         Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+
                     options->put_AdditionalBrowserArguments(
                         L"--allow-file-access-from-files "
                         L"--allow-http-screen-capture "
-                        L"--allow-cross-origin-auth-prompt");
-
+                        L"--allow-cross-origin-auth-prompt "
+                        L"--disable-web-security"
+                        );
 
                     HRESULT res = CreateCoreWebView2EnvironmentWithOptions(
                         nullptr, userDataFolder, options.Get(), m_com_handler);
@@ -1879,12 +1932,90 @@ namespace webview {
                     }
                     ICoreWebView2Settings *settings = nullptr;
                     res = m_webview->get_Settings(&settings);
+
                     if (res != S_OK) { return false; }
+
                     res = settings->put_AreDevToolsEnabled(debug ? TRUE :
                                                                    FALSE);
                     if (res != S_OK) { return false; }
                     init("window.external={invoke:s=>window.chrome.webview."
                          "postMessage(s)}");
+
+
+
+
+
+
+
+                    EventRegistrationToken token = {};
+
+            m_webview->AddWebResourceRequestedFilter(
+                L"overload:*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
+            CHECK_FAILURE(m_webview->add_WebResourceRequested(
+                Callback<ICoreWebView2WebResourceRequestedEventHandler>(
+                    [this](
+                        ICoreWebView2* sender,
+                        ICoreWebView2WebResourceRequestedEventArgs* args) {
+                        COREWEBVIEW2_WEB_RESOURCE_CONTEXT resourceContext;
+                        CHECK_FAILURE(args->get_ResourceContext(&resourceContext));
+
+                        wil::com_ptr<ICoreWebView2WebResourceRequest> request;
+                        args->get_Request(&request);
+                        LPWSTR uri;
+                        request->get_Uri(&uri);
+
+                        std::string strpath = CW2A(uri);
+                        std::string filename = strpath.substr(strpath.find_last_of(":") + 1);
+                        std::string ext = strpath.substr(strpath.find_last_of(".") + 1);
+
+                        // Override the response with an another image.
+                        // If put_Response is not called, the request will continue as normal.
+                        wil::com_ptr<IStream> stream;
+                        /*CHECK_FAILURE(SHCreateStreamOnFileEx(
+                            L"assets/image.jpg", STGM_READ, FILE_ATTRIBUTE_NORMAL,
+                            FALSE, nullptr, &stream));*/
+
+                        auto it = vfs->find(filename);
+                        if (it != vfs->end()){
+
+                            char *acTemp;
+                            std::uint64_t datalen = strlen(it->second.data());
+                            acTemp = (char *) GlobalAlloc (GMEM_FIXED, datalen);
+                            memcpy (acTemp, it->second.data(), datalen);
+                            ::CreateStreamOnHGlobal(acTemp, TRUE, &stream);
+
+
+
+                        }
+
+                        wil::com_ptr<ICoreWebView2WebResourceResponse> response;
+                        wil::com_ptr<ICoreWebView2Environment> environment;
+                        wil::com_ptr<ICoreWebView2_2> webview2;
+                        CHECK_FAILURE(m_webview->QueryInterface(IID_PPV_ARGS(&webview2)));
+                        CHECK_FAILURE(webview2->get_Environment(&environment));
+
+                        std::wstring content_type = L"Content-Type: " + mime_type[ext];
+
+                        CHECK_FAILURE(environment->CreateWebResourceResponse(
+                            stream.get(), 200, L"OK", content_type.c_str(), &response));
+                        CHECK_FAILURE(args->put_Response(response.get()));
+                        return S_OK;
+                    })
+                    .Get(),
+                &token));
+
+
+
+
+
+
+
+
+
+
+
+                    if (res != S_OK) { return false; }
+
                     return true;
                 }
 
@@ -1945,6 +2076,22 @@ namespace webview {
                     return;
                 }
                 browser_engine::navigate(url);
+            }
+
+            void navigate_res(const std::string &url) {
+
+                if (url == "") {
+
+                    browser_engine::navigate("about:blank");
+                    return;
+
+                }
+                #ifdef _WIN32
+                browser_engine::navigate_res(url);
+                #else
+                brwoser_engine::navigate(url);
+                #endif
+
             }
 
             using binding_t =
