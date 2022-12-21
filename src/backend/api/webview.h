@@ -246,12 +246,12 @@ using fs_map = std::map<std::string, std::string>;
 using mime_map = std::map<std::string, std::wstring>;
 
 mime_map mime_type = {{"html", L"text/html"},        {"htm", L"text/html"},
-                    {"css", L"text/css"},          {"js", L"text/javascript"},
-                    {"json", L"application/json"}, {"txt", L"text/plain"},
-                    {"webp", L"image/webp"},       {"csv", L"text/csv"},
-                    {"mp4", L"video/mp4"},         {"png", L"image/png"},
-                    {"jpeg", L"image/jpeg"},       {"jpg", L"image/jpeg"},
-                    {"xml", L"application/xml"}};
+                      {"css", L"text/css"},          {"js", L"text/javascript"},
+                      {"json", L"application/json"}, {"txt", L"text/plain"},
+                      {"webp", L"image/webp"},       {"csv", L"text/csv"},
+                      {"mp4", L"video/mp4"},         {"png", L"image/png"},
+                      {"jpeg", L"image/jpeg"},       {"jpg", L"image/jpeg"},
+                      {"xml", L"application/xml"}};
 
 #else
 
@@ -262,12 +262,12 @@ using mime_map = std::map<std::string, std::string>;
 #define DIR_SEPARATOR '/'
 
 mime_map mime_type = {{"html", "text/html"},        {"htm", "text/html"},
-                    {"css", "text/css"},          {"js", "text/javascript"},
-                    {"json", "application/json"}, {"txt", "text/plain"},
-                    {"webp", "image/webp"},       {"csv", "text/csv"},
-                    {"mp4", "video/mp4"},         {"png", "image/png"},
-                    {"jpeg", "image/jpeg"},       {"jpg", "image/jpeg"},
-                    {"xml", "application/xml"}};
+                      {"css", "text/css"},          {"js", "text/javascript"},
+                      {"json", "application/json"}, {"txt", "text/plain"},
+                      {"webp", "image/webp"},       {"csv", "text/csv"},
+                      {"mp4", "video/mp4"},         {"png", "image/png"},
+                      {"jpeg", "image/jpeg"},       {"jpg", "image/jpeg"},
+                      {"xml", "application/xml"}};
 
 #endif
 
@@ -1863,9 +1863,7 @@ namespace webview {
                     } else {
 
                         m_webview->Navigate(L"about:blank");
-
                     }
-
                 }
 
                 void init(const std::string &js) {
@@ -1918,8 +1916,7 @@ namespace webview {
                         L"--allow-file-access-from-files "
                         L"--allow-http-screen-capture "
                         L"--allow-cross-origin-auth-prompt "
-                        L"--disable-web-security"
-                        );
+                        L"--disable-web-security");
 
                     HRESULT res = CreateCoreWebView2EnvironmentWithOptions(
                         nullptr, userDataFolder, options.Get(), m_com_handler);
@@ -1941,77 +1938,70 @@ namespace webview {
                     init("window.external={invoke:s=>window.chrome.webview."
                          "postMessage(s)}");
 
-
-
-
-
-
-
                     EventRegistrationToken token = {};
 
-            m_webview->AddWebResourceRequestedFilter(
-                L"overload:*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
-            CHECK_FAILURE(m_webview->add_WebResourceRequested(
-                Callback<ICoreWebView2WebResourceRequestedEventHandler>(
-                    [this](
-                        ICoreWebView2* sender,
-                        ICoreWebView2WebResourceRequestedEventArgs* args) {
-                        COREWEBVIEW2_WEB_RESOURCE_CONTEXT resourceContext;
-                        CHECK_FAILURE(args->get_ResourceContext(&resourceContext));
+                    m_webview->AddWebResourceRequestedFilter(
+                        L"overload:*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
+                    CHECK_FAILURE(m_webview->add_WebResourceRequested(
+                        Callback<ICoreWebView2WebResourceRequestedEventHandler>(
+                            [this](ICoreWebView2 *sender,
+                                   ICoreWebView2WebResourceRequestedEventArgs
+                                       *args) {
+                                COREWEBVIEW2_WEB_RESOURCE_CONTEXT
+                                resourceContext;
+                                CHECK_FAILURE(args->get_ResourceContext(
+                                    &resourceContext));
 
-                        wil::com_ptr<ICoreWebView2WebResourceRequest> request;
-                        args->get_Request(&request);
-                        LPWSTR uri;
-                        request->get_Uri(&uri);
+                                wil::com_ptr<ICoreWebView2WebResourceRequest>
+                                    request;
+                                args->get_Request(&request);
+                                LPWSTR uri;
+                                request->get_Uri(&uri);
 
-                        std::string strpath = CW2A(uri);
-                        std::string filename = strpath.substr(strpath.find_last_of(":") + 1);
-                        std::string ext = strpath.substr(strpath.find_last_of(".") + 1);
+                                std::string strpath = CW2A(uri);
+                                std::string filename = strpath.substr(
+                                    strpath.find_last_of(":") + 1);
+                                std::string ext = strpath.substr(
+                                    strpath.find_last_of(".") + 1);
 
-                        // Override the response with an another image.
-                        // If put_Response is not called, the request will continue as normal.
-                        wil::com_ptr<IStream> stream;
-                        /*CHECK_FAILURE(SHCreateStreamOnFileEx(
-                            L"assets/image.jpg", STGM_READ, FILE_ATTRIBUTE_NORMAL,
-                            FALSE, nullptr, &stream));*/
+                                wil::com_ptr<IStream> stream;
 
-                        auto it = vfs->find(filename);
-                        if (it != vfs->end()){
+                                auto it = vfs->find(filename);
+                                if (it != vfs->end()) {
 
-                            char *acTemp;
-                            std::uint64_t datalen = strlen(it->second.data());
-                            acTemp = (char *) GlobalAlloc (GMEM_FIXED, datalen);
-                            memcpy (acTemp, it->second.data(), datalen);
-                            ::CreateStreamOnHGlobal(acTemp, TRUE, &stream);
+                                    char *acTemp;
+                                    std::uint64_t datalen = strlen(
+                                        it->second.data());
+                                    acTemp = (char *)GlobalAlloc(GMEM_FIXED,
+                                                                 datalen);
+                                    memcpy(acTemp, it->second.data(), datalen);
+                                    ::CreateStreamOnHGlobal(acTemp, TRUE,
+                                                            &stream);
+                                }
 
+                                wil::com_ptr<ICoreWebView2WebResourceResponse>
+                                    response;
+                                wil::com_ptr<ICoreWebView2Environment>
+                                    environment;
+                                wil::com_ptr<ICoreWebView2_2> webview2;
+                                CHECK_FAILURE(m_webview->QueryInterface(
+                                    IID_PPV_ARGS(&webview2)));
+                                CHECK_FAILURE(
+                                    webview2->get_Environment(&environment));
 
+                                std::wstring content_type = L"Content-Type: " +
+                                                            mime_type[ext];
 
-                        }
-
-                        wil::com_ptr<ICoreWebView2WebResourceResponse> response;
-                        wil::com_ptr<ICoreWebView2Environment> environment;
-                        wil::com_ptr<ICoreWebView2_2> webview2;
-                        CHECK_FAILURE(m_webview->QueryInterface(IID_PPV_ARGS(&webview2)));
-                        CHECK_FAILURE(webview2->get_Environment(&environment));
-
-                        std::wstring content_type = L"Content-Type: " + mime_type[ext];
-
-                        CHECK_FAILURE(environment->CreateWebResourceResponse(
-                            stream.get(), 200, L"OK", content_type.c_str(), &response));
-                        CHECK_FAILURE(args->put_Response(response.get()));
-                        return S_OK;
-                    })
-                    .Get(),
-                &token));
-
-
-
-
-
-
-
-
-
+                                CHECK_FAILURE(
+                                    environment->CreateWebResourceResponse(
+                                        stream.get(), 200, L"OK",
+                                        content_type.c_str(), &response));
+                                CHECK_FAILURE(
+                                    args->put_Response(response.get()));
+                                return S_OK;
+                            })
+                            .Get(),
+                        &token));
 
 
                     if (res != S_OK) { return false; }
@@ -2084,14 +2074,12 @@ namespace webview {
 
                     browser_engine::navigate("about:blank");
                     return;
-
                 }
-                #ifdef _WIN32
+#ifdef _WIN32
                 browser_engine::navigate_res(url);
-                #else
-                brwoser_engine::navigate(url);
-                #endif
-
+#else
+                browser_engine::navigate(url);
+#endif
             }
 
             using binding_t =
