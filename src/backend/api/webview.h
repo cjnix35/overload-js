@@ -707,7 +707,7 @@ void overload_embedded_scheme(WebKitURISchemeRequest *request) {
         webkit_uri_scheme_request_finish(request, stream, stream_length,
                                          mime_type[ext].c_str());
 
-        g_object_unref(stream);
+        // g_object_unref(stream);
 
     } else {
 
