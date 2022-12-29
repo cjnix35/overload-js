@@ -31,16 +31,20 @@ namespace over {
     using namespace rapidjson;
     using Resource = std::string;
 
-    std::string MakeDir(std::string args);
-    std::string ReadFile(std::string args);
-    std::string WriteFile(std::string args);
-    std::string AppendFile(std::string args);
-    std::string RemoveFile(std::string args);
-    std::string RemoveDir(std::string args);
-    std::string ListDir(std::string args);
-    std::string AbsolutePath(std::string args);
-    std::string exists(std::string args);
-    Resource GetResourceContent(std::string res_name);
+    namespace fs {
+
+
+        std::string MakeDir(std::string args);
+        std::string ReadFile(std::string args);
+        std::string WriteFile(std::string args);
+        std::string AppendFile(std::string args);
+        std::string RemoveFile(std::string args);
+        std::string RemoveDir(std::string args);
+        std::string ListDir(std::string args);
+        std::string AbsolutePath(std::string args);
+        std::string exists(std::string args);
+        Resource GetResourceContent(std::string res_name);
+    }; // namespace fs
 
 
 }; // namespace over
