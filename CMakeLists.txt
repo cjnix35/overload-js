@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(BACKEND_PATH "src/backend" CACHE STRING "Path to backend")
-set(API_PATH "src/backend/api" CACHE STRING "Path to api")
+set(API_PATH "src/backend/overload" CACHE STRING "Path to overload source code")
 set(OVERLOAD_APP_PATH "src/backend/app" CACHE STRING "Path to overload-app backend")
 set(DEFAULT_BUILD_TYPE "Release" CACHE STRING "Define default build type")
 
