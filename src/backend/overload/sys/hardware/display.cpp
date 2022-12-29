@@ -2,7 +2,7 @@
 
 #ifdef _WIN32
 
-namespace api {
+namespace over {
 
 
     std::string GetDisplaySize(std::string args) {
@@ -21,11 +21,11 @@ namespace api {
     }
 
 
-}; // namespace api
+}; // namespace over
 
 #elif __linux__
 
-namespace api {
+namespace over {
 
 
     std::string GetDisplaySize(std::string args) {
@@ -43,11 +43,11 @@ namespace api {
                    ",\"height\":" + std::to_string(workarea.height) + "}";
         }
     }
-}; // namespace api
+}; // namespace over
 
 #elif (__APPLE__ && __MACH__)
 
-namespace api {
+namespace over {
 
 
     std::string GetDisplaySize(std::string args) {
@@ -60,6 +60,6 @@ namespace api {
     }
 
 
-}; // namespace api
+}; // namespace over
 
 #endif

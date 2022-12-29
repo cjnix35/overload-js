@@ -1,29 +1,29 @@
 #include "os.hpp"
 
-namespace api {
+namespace over {
 
 
     std::string Platform(std::string args) {
 
 #ifdef _WIN32
-        return api::Quotes("windows");
+        return over::Quotes("windows");
 #elif __APPLE__ || __MACH__
-        return api::Quotes("darwin");
+        return over::Quotes("darwin");
 #elif __linux__
-        return api::Quotes("linux");
+        return over::Quotes("linux");
 #elif __FreeBSD__
-        return api::Quotes("freebsd");
+        return over::Quotes("freebsd");
 #else
-        return api::Quotes("other");
+        return over::Quotes("other");
 #endif
     }
 
 
-}; // namespace api
+}; // namespace over
 
 #ifdef _WIN32
 
-namespace api {
+namespace over {
 
 
     std::string Version(std::string args) {
@@ -51,15 +51,15 @@ namespace api {
         stream << dwMajorVersion << "." << dwMinorVersion << " (" << dwBuild
                << ")";
 
-        return api::Quotes("Windows " + stream.str());
+        return over::Quotes("Windows " + stream.str());
     }
 
 
-}; // namespace api
+}; // namespace over
 
 #elif __linux__ || (__APPLE__ && __MACH__)
 
-namespace api {
+namespace over {
 
 
     std::string Version(std::string args) {
@@ -71,11 +71,11 @@ namespace api {
             exit(EXIT_FAILURE);
         }
 
-        return api::Quotes(std::string(buffer.sysname) + " (" +
-                           std::string(buffer.release) + ")");
+        return over::Quotes(std::string(buffer.sysname) + " (" +
+                            std::string(buffer.release) + ")");
     }
 
 
-}; // namespace api
+}; // namespace over
 
 #endif

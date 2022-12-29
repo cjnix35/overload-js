@@ -2,7 +2,7 @@
 
 #ifdef _WIN32
 
-namespace api {
+namespace over {
 
 
     std::string GetTotalPhysicalMemory(std::string args) {
@@ -71,11 +71,11 @@ namespace api {
     }
 
 
-}; // namespace api
+}; // namespace over
 
 #elif __linux__
 
-namespace api {
+namespace over {
 
 
     std::uint64_t parseLine(char* line) {
@@ -171,44 +171,44 @@ namespace api {
     }
 
 
-}; // namespace api
+}; // namespace over
 
 #elif (__APPLE__ && __MACH__)
 
-namespace api {
+namespace over {
 
 
     std::string GetTotalPhysicalMemory(std::string args) {
 
-        return api::Quotes("Memory library is not supported on MacOS.");
+        return over::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetPhysicalMemoryUsage(std::string args) {
 
-        return api::Quotes("Memory library is not supported on MacOS.");
+        return over::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetProcPhysMemoryUsage(std::string args) {
 
-        return api::Quotes("Memory library is not supported on MacOS.");
+        return over::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetTotalVirtualMemory(std::string args) {
 
-        return api::Quotes("Memory library is not supported on MacOS.");
+        return over::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetVirtualMemoryUsage(std::string args) {
 
-        return api::Quotes("Memory library is not supported on MacOS.");
+        return over::Quotes("Memory library is not supported on MacOS.");
     }
 
     std::string GetProcVirtualMemoryUsage(std::string args) {
 
-        return api::Quotes("Memory library is not supported on MacOS.");
+        return over::Quotes("Memory library is not supported on MacOS.");
     }
 
 
-}; // namespace api
+}; // namespace over
 
 #endif

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../misc.hpp"
+#include "overload/misc.hpp"
 
 #ifdef _WIN32
 
@@ -20,7 +20,7 @@
 #endif
 
 
-namespace api {
+namespace over {
 
     std::string CPUFrequency(std::string args);
 
@@ -32,4 +32,4 @@ namespace api {
     std::string CPUModel(std::string args);
 
 
-}; // namespace api
+}; // namespace over

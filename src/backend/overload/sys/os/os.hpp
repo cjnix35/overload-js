@@ -1,17 +1,17 @@
 #pragma once
 
-#include "../../misc.hpp"
+#include "overload/misc.hpp"
 
 #include <sstream>
 
-namespace api {
+namespace over {
 
 
     std::string Platform(std::string args);
     std::string Version(std::string args);
 
 
-}; // namespace api
+}; // namespace over
 
 #ifdef _WIN32
 

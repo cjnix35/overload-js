@@ -26,10 +26,10 @@
 
 #endif
 
-using namespace rapidjson;
-using Resource = std::string;
+namespace over {
 
-namespace api {
+    using namespace rapidjson;
+    using Resource = std::string;
 
     std::string MakeDir(std::string args);
     std::string ReadFile(std::string args);
@@ -39,15 +39,8 @@ namespace api {
     std::string RemoveDir(std::string args);
     std::string ListDir(std::string args);
     std::string AbsolutePath(std::string args);
-
-    // static int copy_data(struct archive *ar, struct archive *aw);
-    // static int extract_file(const char *filename);
-    // static int extract_mem(std::uint8_t *buf, std::uint64_t buf_len);
-
-    // bool LoadResourcesFromFile(std::string filename);
-    // bool LoadResourcesFromMemory(std::uint8_t *buf, std::uint64_t *buf_len);
-    std::string ResourcePath(std::string res_name);
+    std::string exists(std::string args);
     Resource GetResourceContent(std::string res_name);
 
 
-}; // namespace api
+}; // namespace over

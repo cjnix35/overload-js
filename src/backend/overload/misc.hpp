@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace api {
+namespace over {
 
     std::string Quotes(std::string args) noexcept;
 
@@ -11,7 +11,7 @@ namespace api {
     constexpr auto JNoRet = "";
 
 
-}; // namespace api
+}; // namespace over
 
 #if defined(_WIN32)
 #define argc __argc
