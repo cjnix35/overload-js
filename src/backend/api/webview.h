@@ -278,7 +278,8 @@ bool m_extract = true;
 
 std::unique_ptr<fs_map> vfs = std::make_unique<fs_map>();
 
-void unpackFiles(rapidjson::Value &object, const std::string &sPath = "/") {
+static void unpackFiles(rapidjson::Value &object,
+                        const std::string &sPath = "/") {
 
     for (auto itr = object.MemberBegin(); itr != object.MemberEnd(); ++itr) {
         std::string sFilePath = sPath + itr->name.GetString();
@@ -308,8 +309,8 @@ void unpackFiles(rapidjson::Value &object, const std::string &sPath = "/") {
     }
 }
 
-void unpackFilesMem(rapidjson::Value &object, std::uint8_t *buf,
-                    const std::string &sPath = "/") {
+static void unpackFilesMem(rapidjson::Value &object, std::uint8_t *buf,
+                           const std::string &sPath = "/") {
 
     for (auto itr = object.MemberBegin(); itr != object.MemberEnd(); ++itr) {
         std::string sFilePath = sPath + itr->name.GetString();
