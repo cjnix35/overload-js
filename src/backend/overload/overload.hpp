@@ -14,14 +14,14 @@
 #include "sys/hardware/display.hpp"
 #include "sys/hardware/mem.hpp"
 
+using namespace rapidjson;
+
 namespace over {
 
     using binding_t = std::function<void(std::string, std::string, void *)>;
     using sync_binding_t = std::function<std::string(std::string)>;
 
     class Application {
-
-            using namespace rapidjson;
 
         private:
             void bind_init() noexcept;
