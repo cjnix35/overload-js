@@ -27,18 +27,20 @@
 
 namespace over {
 
+    namespace sys {
 
-    std::string GetTotalPhysicalMemory(std::string args);
+        std::string GetTotalPhysicalMemory(std::string args);
 
-    std::string GetPhysicalMemoryUsage(std::string args);
+        std::string GetPhysicalMemoryUsage(std::string args);
 
-    std::string GetProcPhysMemoryUsage(std::string args);
+        std::string GetProcPhysMemoryUsage(std::string args);
 
-    std::string GetTotalVirtualMemory(std::string args);
+        std::string GetTotalVirtualMemory(std::string args);
 
-    std::string GetVirtualMemoryUsage(std::string args);
+        std::string GetVirtualMemoryUsage(std::string args);
 
-    std::string GetProcVirtualMemoryUsage(std::string args);
+        std::string GetProcVirtualMemoryUsage(std::string args);
 
+    }; // namespace sys
 
 }; // namespace over

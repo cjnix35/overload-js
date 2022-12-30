@@ -22,14 +22,17 @@
 
 namespace over {
 
-    std::string CPUFrequency(std::string args);
+    namespace sys {
 
-    template <std::uint32_t IdentLen>
-    static std::string CentralProcessorSubkey(const char* key);
+        std::string CPUFrequency(std::string args);
 
-    std::string CPUVendor(std::string args);
+        template <std::uint32_t IdentLen>
+        static std::string CentralProcessorSubkey(const char* key);
 
-    std::string CPUModel(std::string args);
+        std::string CPUVendor(std::string args);
 
+        std::string CPUModel(std::string args);
+
+    }; // namespace sys
 
 }; // namespace over

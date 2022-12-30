@@ -2,140 +2,154 @@
 
 #ifdef _WIN32
 
-namespace api {
+namespace over {
 
-    std::string CPUFrequency(std::string args) {
+    namespace sys {
 
-        HKEY hkey;
-        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE,
-                          R"(HARDWARE\DESCRIPTION\System\CentralProcessor\0)",
-                          0, KEY_READ, &hkey)) {
-            LARGE_INTEGER freq;
-            QueryPerformanceFrequency(&freq);
-            return std::to_string(freq.QuadPart * 1'000);
+        std::string CPUFrequency(std::string args) {
+
+            HKEY hkey;
+            if (RegOpenKeyExA(
+                    HKEY_LOCAL_MACHINE,
+                    R"(HARDWARE\DESCRIPTION\System\CentralProcessor\0)", 0,
+                    KEY_READ, &hkey)) {
+                LARGE_INTEGER freq;
+                QueryPerformanceFrequency(&freq);
+                return std::to_string(freq.QuadPart * 1'000);
+            }
+
+            DWORD freq_mhz;
+            DWORD freq_mhz_len = sizeof(freq_mhz);
+            if (RegQueryValueExA(
+                    hkey, "~MHz", nullptr, nullptr,
+                    static_cast<LPBYTE>(static_cast<void*>(&freq_mhz)),
+                    &freq_mhz_len))
+                return over::JNoRet;
+
+            return std::to_string(freq_mhz);
         }
 
-        DWORD freq_mhz;
-        DWORD freq_mhz_len = sizeof(freq_mhz);
-        if (RegQueryValueExA(hkey, "~MHz", nullptr, nullptr,
-                             static_cast<LPBYTE>(static_cast<void*>(&freq_mhz)),
-                             &freq_mhz_len))
-            return JNoRet;
+        template <std::uint32_t IdentLen>
+        static std::string CentralProcessorSubkey(const char* key) {
+            HKEY hkey;
+            if (RegOpenKeyExA(
+                    HKEY_LOCAL_MACHINE,
+                    R"(HARDWARE\DESCRIPTION\System\CentralProcessor\0)", 0,
+                    KEY_READ, &hkey))
+                return {};
 
-        return std::to_string(freq_mhz);
-    }
+            char identifier[IdentLen];
+            DWORD identifier_len = sizeof(identifier);
+            LPBYTE lpdata = static_cast<LPBYTE>(
+                static_cast<void*>(&identifier[0]));
+            if (RegQueryValueExA(hkey, key, nullptr, nullptr, lpdata,
+                                 &identifier_len))
+                return {};
 
-    template <std::uint32_t IdentLen>
-    static std::string CentralProcessorSubkey(const char* key) {
-        HKEY hkey;
-        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE,
-                          R"(HARDWARE\DESCRIPTION\System\CentralProcessor\0)",
-                          0, KEY_READ, &hkey))
-            return {};
+            return identifier;
+        }
 
-        char identifier[IdentLen];
-        DWORD identifier_len = sizeof(identifier);
-        LPBYTE lpdata = static_cast<LPBYTE>(static_cast<void*>(&identifier[0]));
-        if (RegQueryValueExA(hkey, key, nullptr, nullptr, lpdata,
-                             &identifier_len))
-            return {};
+        std::string CPUVendor(std::string args) {
+            return over::Quotes(
+                CentralProcessorSubkey<12 + 1>("VendorIdentifier"));
+        }
 
-        return identifier;
-    }
+        std::string CPUModel(std::string args) {
+            return over::Quotes(
+                CentralProcessorSubkey<64 + 1>("ProcessorNameString"));
+        }
 
-    std::string CPUVendor(std::string args) {
-        return api::Quotes(CentralProcessorSubkey<12 + 1>("VendorIdentifier"));
-    }
+    }; // namespace sys
 
-    std::string CPUModel(std::string args) {
-        return api::Quotes(
-            CentralProcessorSubkey<64 + 1>("ProcessorNameString"));
-    }
-
-
-}; // namespace api
+}; // namespace over
 
 #elif __linux__
 
-namespace api {
+namespace over {
 
+    namespace sys {
 
-    std::string CPUFrequency(std::string args) {
+        std::string CPUFrequency(std::string args) {
 
-        std::ifstream f("/proc/cpuinfo");
+            std::ifstream f("/proc/cpuinfo");
 
-        if (f.is_open()) {
+            if (f.is_open()) {
 
-            for (std::string tmp; std::getline(f, tmp);) {
-                if (tmp.find("cpu MHz") == 0) {
-                    const auto colon_id = tmp.find_first_of(':');
-                    return std::to_string(static_cast<std::uint64_t>(
-                        std::strtod(tmp.c_str() + colon_id + 1, nullptr)));
+                for (std::string tmp; std::getline(f, tmp);) {
+                    if (tmp.find("cpu MHz") == 0) {
+                        const auto colon_id = tmp.find_first_of(':');
+                        return std::to_string(static_cast<std::uint64_t>(
+                            std::strtod(tmp.c_str() + colon_id + 1, nullptr)));
+                    }
                 }
             }
+
+            return over::JNoRet;
         }
 
-        return JNoRet;
-    }
+        static std::string cpuinfo_value(const char* key) {
+            std::ifstream f("/proc/cpuinfo");
 
-    static std::string cpuinfo_value(const char* key) {
-        std::ifstream f("/proc/cpuinfo");
+            if (f.is_open()) {
 
-        if (f.is_open()) {
-
-            for (std::string line; std::getline(f, line);)
-                if (line.find(key) == 0) {
-                    const auto colon_id = line.find_first_of(':');
-                    const auto nonspace_id = line.find_first_not_of(
-                        " \t", colon_id + 1);
-                    return line.c_str() + nonspace_id;
-                }
+                for (std::string line; std::getline(f, line);)
+                    if (line.find(key) == 0) {
+                        const auto colon_id = line.find_first_of(':');
+                        const auto nonspace_id = line.find_first_not_of(
+                            " \t", colon_id + 1);
+                        return line.c_str() + nonspace_id;
+                    }
+            }
+            return over::JNoRet;
         }
-        return JNoRet;
-    }
 
 
-    std::string CPUVendor(std::string args) {
-        return api::Quotes(cpuinfo_value("vendor"));
-    }
+        std::string CPUVendor(std::string args) {
+            return over::Quotes(cpuinfo_value("vendor"));
+        }
 
-    std::string CPUModel(std::string args) {
-        return api::Quotes(cpuinfo_value("model name"));
-    }
+        std::string CPUModel(std::string args) {
+            return over::Quotes(cpuinfo_value("model name"));
+        }
 
+    }; // namespace sys
 
-}; // namespace api
+}; // namespace over
 
 #elif (__APPLE__ && __MACH__)
 
-namespace api {
+namespace over {
 
-    std::string CPUFrequency(std::string args) {
+    namespace sys {
 
-        const auto ctl_data = sysctl("hw.cpufrequency");
-        if (ctl_data.empty()) return 0;
+        std::string CPUFrequency(std::string args) {
 
-        const auto data = deconstruct_sysctl_int(ctl_data);
-        if (!data.first) return 0;
+            const auto ctl_data = sysctl("hw.cpufrequency");
+            if (ctl_data.empty()) return 0;
 
-        return std::to_string(data.second);
-    }
+            const auto data = deconstruct_sysctl_int(ctl_data);
+            if (!data.first) return 0;
 
-    static std::string sysctl_value(const char* subkey) {
-        auto ctl_data = sysctl((std::string("machdep.cpu.") + subkey).c_str());
-        if (ctl_data.empty()) return {};
-        else return ctl_data.data();
-    }
+            return std::to_string(data.second);
+        }
 
-    std::string CPUVendor(std::string args) {
-        return api::Quotes(sysctl_value("vendor"));
-    }
+        static std::string sysctl_value(const char* subkey) {
+            auto ctl_data = sysctl(
+                (std::string("machdep.cpu.") + subkey).c_str());
+            if (ctl_data.empty()) return {};
+            else return ctl_data.data();
+        }
 
-    std::string CPUModel(std::string args) {
-        return api::Quotes(sysctl_value("brand_string"));
-    }
+        std::string CPUVendor(std::string args) {
+            return over::Quotes(sysctl_value("vendor"));
+        }
 
+        std::string CPUModel(std::string args) {
+            return over::Quotes(sysctl_value("brand_string"));
+        }
 
-}; // namespace api
+    }; // namespace sys
+
+}; // namespace over
 
 #endif

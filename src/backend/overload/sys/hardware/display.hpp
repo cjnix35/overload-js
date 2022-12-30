@@ -18,8 +18,10 @@
 
 namespace over {
 
+    namespace sys {
 
-    std::string GetDisplaySize(std::string args);
+        std::string GetDisplaySize(std::string args);
 
+    };
 
 }; // namespace over
