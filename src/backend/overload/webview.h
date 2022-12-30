@@ -1402,8 +1402,6 @@ namespace webview {
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
 
-#include <iostream>
-
 #ifdef _MSC_VER
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "shell32.lib")
