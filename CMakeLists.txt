@@ -54,6 +54,14 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+FetchContent_Declare(
+  sioclient
+  GIT_REPOSITORY https://github.com/socketio/socket.io-client-cpp.git
+  GIT_TAG        3.1.0
+)
+
+FetchContent_MakeAvailable(sioclient)
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         if (CMAKE_BUILD_TYPE STREQUAL "Release")
         add_compile_options(/Ot /Ox /Zc:auto /fp:fast /GT /GS- /Oi /GF /utf-8 /D_HAS_EXCEPTIONS=0 /MT /MTd)
@@ -78,6 +86,8 @@ add_library(overos "$CACHE{API_PATH}/sys/os/os.cpp")
 add_library(overhttp "$CACHE{API_PATH}/net/http.cpp")
 add_library(oversocketio "$CACHE{API_PATH}/net/socketio.cpp")
 add_library(misc "$CACHE{API_PATH}/misc.cpp")
+
+target_link_libraries(oversocketio PUBLIC sioclient::sioclient)
 
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
