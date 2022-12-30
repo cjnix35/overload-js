@@ -189,27 +189,27 @@ namespace over {
     typedef std::string (*FnPtr)(std::string);
     std::map<std::string, FnPtr> Functions = {
 
-        {"fs_makeDir", over::MakeDir},
-        {"fs_readFile", over::ReadFile},
-        {"fs_writeFile", over::WriteFile},
-        {"fs_appendFile", over::AppendFile},
-        {"fs_removeFile", over::RemoveFile},
-        {"fs_removeDir", over::RemoveDir},
-        {"fs_listDir", over::ListDir},
-        {"fs_absolutePath", over::AbsolutePath},
+        {"fs_makeDir", over::fs::MakeDir},
+        {"fs_readFile", over::fs::ReadFile},
+        {"fs_writeFile", over::fs::WriteFile},
+        {"fs_appendFile", over::fs::AppendFile},
+        {"fs_removeFile", over::fs::RemoveFile},
+        {"fs_removeDir", over::fs::RemoveDir},
+        {"fs_listDir", over::fs::ListDir},
+        {"fs_absolutePath", over::fs::AbsolutePath},
 
-        {"sys_version", over::Version},
-        {"sys_platform", over::Platform},
-        {"sys_cpuFrequency", over::CPUFrequency},
-        {"sys_cpuVendor", over::CPUVendor},
-        {"sys_cpuModel", over::CPUModel},
-        {"sys_displaySize", over::GetDisplaySize},
-        {"sys_totalPhysMemory", over::GetTotalPhysicalMemory},
-        {"sys_physMemoryUsage", over::GetPhysicalMemoryUsage},
-        {"sys_procPhysMemoryUsage", over::GetProcPhysMemoryUsage},
-        {"sys_totalVirtualMemory", over::GetTotalVirtualMemory},
-        {"sys_virtualMemoryUsage", over::GetVirtualMemoryUsage},
-        {"sys_procVirtualMemoryUsage", over::GetProcVirtualMemoryUsage}};
+        {"sys_version", over::sys::Version},
+        {"sys_platform", over::sys::Platform},
+        {"sys_cpuFrequency", over::sys::CPUFrequency},
+        {"sys_cpuVendor", over::sys::CPUVendor},
+        {"sys_cpuModel", over::sys::CPUModel},
+        {"sys_displaySize", over::sys::GetDisplaySize},
+        {"sys_totalPhysMemory", over::sys::GetTotalPhysicalMemory},
+        {"sys_physMemoryUsage", over::sys::GetPhysicalMemoryUsage},
+        {"sys_procPhysMemoryUsage", over::sys::GetProcPhysMemoryUsage},
+        {"sys_totalVirtualMemory", over::sys::GetTotalVirtualMemory},
+        {"sys_virtualMemoryUsage", over::sys::GetVirtualMemoryUsage},
+        {"sys_procVirtualMemoryUsage", over::sys::GetProcVirtualMemoryUsage}};
 
     static std::string AsyncWithoutValueCPP(std::string args) {
 
@@ -295,92 +295,93 @@ namespace over {
 
         // Takes as argument path where dir has to be created
         // JS: function fs_makeDir(path)
-        w.bind("fs_makeDir", over::MakeDir);
+        w.bind("fs_makeDir", over::fs::MakeDir);
 
         // Takes path to file as argument and reads file
         // JS: function fs_readFile(filename)
-        w.bind("fs_readFile", over::ReadFile);
+        w.bind("fs_readFile", over::fs::ReadFile);
 
         // Takes 2 arguments: path to file and what to write. Writes provided
         // data in the provided file JS: function fs_writeFile(filename, data)
-        w.bind("fs_writeFile", over::WriteFile);
+        w.bind("fs_writeFile", over::fs::WriteFile);
 
         // Do the same as function above, but if file exists, doesn't re-write
         // existing data in file. Instead write at the end of the file
         // JS:function fs_appendFile(filename, data)
-        w.bind("fs_appendFile", over::AppendFile);
+        w.bind("fs_appendFile", over::fs::AppendFile);
 
         // Takes path to file as argument. Deletes file that is provided
         // JS: function fs_removeFile(filename)
-        w.bind("fs_removeFile", over::RemoveFile);
+        w.bind("fs_removeFile", over::fs::RemoveFile);
 
         // Do the same as function above, but can delete directory with files
         // JS: function fs_removeDir(dirname)
-        w.bind("fs_removeDir", over::RemoveDir);
+        w.bind("fs_removeDir", over::fs::RemoveDir);
 
         // Takes directory as argument. Lists directory and returns array of
         // files
         // JS: function fs_listDir(dirname)
-        w.bind("fs_listDir", over::ListDir);
+        w.bind("fs_listDir", over::fs::ListDir);
 
         // Takes relative path as argument. Converts relative path to absolute
         // JS: function fs_absolutePath(path)
-        w.bind("fs_absolutePath", over::AbsolutePath);
+        w.bind("fs_absolutePath", over::fs::AbsolutePath);
 
         // Doesn't take any arguments. Returns system version, for example:
         // Linux (6.0.6-arch1-1)
         // JS: function sys_version()
-        w.bind("sys_version", over::Version);
+        w.bind("sys_version", over::sys::Version);
 
         // Doesn't take any arguments. Returns system name in lowercase
         // JS: function sys_platform()
-        w.bind("sys_platform", over::Platform);
+        w.bind("sys_platform", over::sys::Platform);
 
         // Doesn't take any arguments. Returns current CPU frequency in kHz
         // JS: function sys_cpuFrequency()
-        w.bind("sys_cpuFrequency", over::CPUFrequency);
+        w.bind("sys_cpuFrequency", over::sys::CPUFrequency);
 
         // Doesn't take any arguments. Returns CPU vendor
         // JS: function sys_cpuVendor()
-        w.bind("sys_cpuVendor", over::CPUVendor);
+        w.bind("sys_cpuVendor", over::sys::CPUVendor);
 
         // Doesn't take any arguments. Returns CPU model name
         // JS: function sys_cpuModel()
-        w.bind("sys_cpuModel", over::CPUModel);
+        w.bind("sys_cpuModel", over::sys::CPUModel);
 
         // Doesn't take any arguments. Returns display width and height in JSON
         // JS: function sys_displaySize()
-        w.bind("sys_displaySize", over::GetDisplaySize);
+        w.bind("sys_displaySize", over::sys::GetDisplaySize);
 
         // Doesn't take any arguments. Returns how much physical memory is
         // installed on current device
         // JS: function sys_totalPhysMemory()
-        w.bind("sys_totalPhysMemory", over::GetTotalPhysicalMemory);
+        w.bind("sys_totalPhysMemory", over::sys::GetTotalPhysicalMemory);
 
         // Doesn't take any arguments. Returns how much physical memory is
         // currently in use
         // JS: function sys_totalPhysMemoryUsage()
-        w.bind("sys_physMemoryUsage", over::GetPhysicalMemoryUsage);
+        w.bind("sys_physMemoryUsage", over::sys::GetPhysicalMemoryUsage);
 
         // Doesn't take any arguments. Returns how much physical memory is
         // currently in use by this process
         // JS: function sys_procPhysMemoryUsage()
-        w.bind("sys_procPhysMemoryUsage", over::GetProcPhysMemoryUsage);
+        w.bind("sys_procPhysMemoryUsage", over::sys::GetProcPhysMemoryUsage);
 
         // Doesn't take any arguments. Returns how much total virtual memory is
         // on current device
         // JS: function sys_totalVirtualMemory()
-        w.bind("sys_totalVirtualMemory", over::GetTotalVirtualMemory);
+        w.bind("sys_totalVirtualMemory", over::sys::GetTotalVirtualMemory);
 
         // Doesn't take any arguments. Returns how much virtual memory is
         // currently in use
         // JS: function sys_virtualMemoryUsage()
-        w.bind("sys_virtualMemoryUsage", over::GetVirtualMemoryUsage);
+        w.bind("sys_virtualMemoryUsage", over::sys::GetVirtualMemoryUsage);
 
         // Doesn't take any arguments. Returns how much virtual memory is
         // currently in use by this process
         // JS: function sys_procVirtualMemoryUsage()
-        w.bind("sys_procVirtualMemoryUsage", over::GetProcVirtualMemoryUsage);
+        w.bind("sys_procVirtualMemoryUsage",
+               over::sys::GetProcVirtualMemoryUsage);
     }
 
 

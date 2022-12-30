@@ -68,6 +68,8 @@ if(result)
         set_target_properties(main PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
+include_directories(${BACKEND_PATH})
+
 add_library(overfs "$CACHE{API_PATH}/filesystem/fs.cpp")
 add_library(overcpu "$CACHE{API_PATH}/sys/hardware/cpu.cpp")
 add_library(overdisplay "$CACHE{API_PATH}/sys/hardware/display.cpp")
@@ -92,7 +94,6 @@ target_link_libraries(main PUBLIC misc overfs overcpu overdisplay overmem overos
 
 target_compile_features(main PUBLIC cxx_std_17)
 set_target_properties(main PROPERTIES CXX_EXTENSIONS OFF)
-target_include_directories(main PUBLIC ${BACKEND_PATH})
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread)

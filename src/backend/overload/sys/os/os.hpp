@@ -6,10 +6,12 @@
 
 namespace over {
 
+    namespace sys {
 
-    std::string Platform(std::string args);
-    std::string Version(std::string args);
+        std::string Platform(std::string args);
+        std::string Version(std::string args);
 
+    }; // namespace sys
 
 }; // namespace over
 
