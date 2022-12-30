@@ -21,6 +21,15 @@ namespace over {
     using binding_t = std::function<void(std::string, std::string, void *)>;
     using sync_binding_t = std::function<std::string(std::string)>;
 
+    enum hints {
+
+        none,
+        min,
+        max,
+        fixed
+
+    };
+
     class Application {
 
         private:
@@ -43,6 +52,8 @@ namespace over {
             void unbind(std::string func_name);
             void set_title(std::string title) noexcept;
             void set_size(std::uint64_t x, std::uint64_t y) noexcept;
+            void set_size(std::uint64_t x, std::uint64_t y,
+                          std::uint16_t hint) noexcept;
             void navigate_url(const std::string url);
             void navigate_file(const std::string file);
             void navigate_resource(const std::string res);
@@ -89,6 +100,12 @@ namespace over {
     void Application::set_size(std::uint64_t x, std::uint64_t y) noexcept {
 
         w.set_size(x, y, WEBVIEW_HINT_NONE);
+    }
+
+    void Application::set_size(std::uint64_t x, std::uint64_t y,
+                               std::uint16_t hint) noexcept {
+
+        w.set_size(x, y, hint);
     }
 
     void Application::unbind(std::string func_name) {
@@ -151,7 +168,7 @@ namespace over {
         Document d;
         d.Parse(args.c_str());
 
-        w.set_size(d[0].GetUint64(), d[1].GetUint64(), WEBVIEW_HINT_NONE);
+        w.set_size(d[0].GetUint64(), d[1].GetUint64(), d[2].GetUint64());
 
         return JTrue;
     }
