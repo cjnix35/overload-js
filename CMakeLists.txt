@@ -5,6 +5,7 @@ project(overload_js VERSION 1.0
         LANGUAGES CXX)
 
 include(CheckIPOSupported)
+include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -20,7 +21,6 @@ if(EXISTS "${LOC_PATH}")
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        add_compile_options(/Ot /Zc:auto)
 
 	find_program(NUGET_EXE NAMES nuget "${CMAKE_BINARY_DIR}/nuget.exe")
 	if(NOT NUGET_EXE)
@@ -29,7 +29,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	endif()
 
 	exec_program(${NUGET_EXE}
-    	ARGS install "Microsoft.Web.WebView2" -Version 1.0.1370.28 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+    	ARGS install "Microsoft.Web.WebView2" -Version 1.0.1549-prerelease -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
 	exec_program(${NUGET_EXE}
     	ARGS install "Microsoft.Windows.ImplementationLibrary" -Version 1.0.220914.1 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
 endif()	
@@ -43,7 +43,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if (UNIX)
-        add_compile_options(-Ofast)
+        add_compile_options(-Ofast -fno-exceptions)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -55,6 +55,9 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_compile_options(/Ot /Ox /Zc:auto /fp:fast /GT /GS- /Oi /GF /utf-8 /D_HAS_EXCEPTIONS=0 /MT /MTd)
+        endif()
 	add_executable(main WIN32 "$CACHE{OVERLOAD_APP_PATH}/main.cpp")
 else()
 	add_executable(main "$CACHE{OVERLOAD_APP_PATH}/main.cpp")
@@ -72,9 +75,11 @@ add_library(overmem "$CACHE{API_PATH}/sys/hardware/mem.cpp")
 add_library(overos "$CACHE{API_PATH}/sys/os/os.cpp")
 add_library(misc "$CACHE{API_PATH}/misc.cpp")
 
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
-	target_link_libraries(main PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
+        include_directories(${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/include)
+        target_link_libraries(main PUBLIC "${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/x64/WebView2LoaderStatic.lib")
+	target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets")
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")

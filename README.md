@@ -24,16 +24,16 @@
 
 #### Rendering libraries
 
-- [Linux](https://github.com/torvalds/linux) - [WebKitGTK](https://webkitgtk.org/)
-- Windows - [Microsoft Edge WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/)
-- MacOS - [Apple WebKit2](https://webkit.org/)
+|Linux|Windows|MacOS|
+|-----|-------|-----|
+|[WebKitGTK](https://webkitgtk.org/)|[Microsoft Edge WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/)|[Apple WebKit2](https://webkit.org/)|
 
 #### Frameworks and Libraries
 
 - [React.js](https://reactjs.org/)
-- [JSON C++ lib - nlohmann::json](https://github.com/nlohmann/json)
+- [Rapidjson](https://github.com/nlohmann/json)
 - [Tailwind CSS](https://tailwindcss.com/)
-- C++ 17
+- C++17
 
 #### Build tools
 
@@ -42,8 +42,8 @@
 
 #### Code prettifiers
 
-- C++ - [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html)
-- JS/TS and other - [Prettier](https://prettier.io/)
+- [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html)
+- [Prettier](https://prettier.io/)
 
 ## Installation
 
@@ -98,8 +98,8 @@ npm run build
 ```sh
 mkdir build
 cd build
-cmake ..
-make -j4
+cmake -GNinja ..
+ninja -j 16
 ```
 
 #### Windows
@@ -113,7 +113,9 @@ msbuild overload_js.sln -m /property:Configuration=Release
 
 ## Development
 
-Сurrently Overload.js is under development, there is still a lot of work to be done.
+#### **Overload.js is currently not ready for production use yet.**
+
+Сurrently Overload.js is under development, there is still a lot of work to be done. 
 
 Want to contribute? Great!
 

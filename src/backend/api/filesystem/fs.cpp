@@ -2,32 +2,31 @@
 
 namespace api {
 
-
     std::string MakeDir(std::string args) {
 
-        Document d;
-        d.Parse(args.c_str());
-        std::string path = d[0].GetString();
+        args.erase(0, 2);
+        args.erase(args.size() - 2);
 
-        if (!std::filesystem::exists(path)) {
+        if (!std::filesystem::exists(args)) {
 
-            return std::filesystem::create_directory(path) ? JTrue : JFalse;
+            return std::filesystem::create_directory(args) ? JTrue : JFalse;
 
         } else return JFalse;
     }
 
     std::string ReadFile(std::string args) {
 
-        Document d;
-        d.Parse(args.c_str());
-        std::string filename = d[0].GetString();
-        std::string buf;
-        d.Clear();
-        d.SetArray();
-        Document::AllocatorType& allocator = d.GetAllocator();
+        args.erase(0, 2);
+        args.erase(args.size() - 2);
 
-        std::ifstream f(filename, std::ios_base::in);
+        std::ifstream f(args, std::ios_base::in);
         if (f.is_open()) {
+
+            Document d;
+            std::string buf;
+            d.Clear();
+            d.SetArray();
+            Document::AllocatorType &allocator = d.GetAllocator();
 
             while (std::getline(f, buf)) {
                 d.PushBack(rapidjson::Value{}.SetString(
@@ -49,12 +48,13 @@ namespace api {
 
         Document d;
         d.Parse(args.c_str());
-        std::string filename = d[0].GetString();
+        const auto &filename = d[0].GetString();
 
         std::ofstream f(filename, std::ios_base::trunc);
         if (f.is_open()) {
 
-            f << d[1].GetString();
+            const auto &str = d[1].GetString();
+            f.write(str, strlen(str));
             f.close();
 
             return JTrue;
@@ -66,12 +66,14 @@ namespace api {
 
         Document d;
         d.Parse(args.c_str());
-        std::string filename = d[0].GetString();
+
+        const auto &filename = d[0].GetString();
 
         std::ofstream f(filename, std::ios_base::app);
         if (f.is_open()) {
 
-            f << d[1].GetString();
+            const auto &str = d[1].GetString();
+            f.write(str, strlen(str));
             f.close();
 
             return JTrue;
@@ -81,32 +83,30 @@ namespace api {
 
     std::string RemoveFile(std::string args) {
 
-        Document d;
-        d.Parse(args.c_str());
-        std::string filename = d[0].GetString();
+        args.erase(0, 2);
+        args.erase(args.size() - 2);
 
-        return std::filesystem::remove(filename) ? JTrue : JFalse;
+        return std::filesystem::remove(args) ? JTrue : JFalse;
     }
 
     std::string RemoveDir(std::string args) {
 
-        Document d;
-        d.Parse(args.c_str());
-        std::string dirname = d[0].GetString();
+        args.erase(0, 2);
+        args.erase(args.size() - 2);
 
-        return std::filesystem::remove_all(dirname) ? JTrue : JFalse;
+        return std::filesystem::remove_all(args) ? JTrue : JFalse;
     }
 
     std::string ListDir(std::string args) {
 
-        Document d;
-        d.Parse(args.c_str());
-        std::string dirname = d[0].GetString();
-        d.Clear();
-        d.SetArray();
-        Document::AllocatorType& allocator = d.GetAllocator();
+        args.erase(0, 2);
+        args.erase(args.size() - 2);
 
-        for (const auto& entry : std::filesystem::directory_iterator(dirname))
+        Document d;
+        d.SetArray();
+        Document::AllocatorType &allocator = d.GetAllocator();
+
+        for (const auto &entry : std::filesystem::directory_iterator(args))
             d.PushBack(rapidjson::Value{}.SetString(
                            entry.path().u8string().c_str(),
                            entry.path().u8string().length(), allocator),
@@ -120,11 +120,10 @@ namespace api {
 
     std::string AbsolutePath(std::string args) {
 
-        Document d;
-        d.Parse(args.c_str());
-        std::string path = d[0].GetString();
+        args.erase(0, 2);
+        args.erase(args.size() - 2);
 
-        return api::Quotes(std::filesystem::absolute(path).u8string());
+        return api::Quotes(std::filesystem::absolute(args).u8string());
     }
 
 

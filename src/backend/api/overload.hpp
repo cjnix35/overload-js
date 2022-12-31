@@ -1,26 +1,195 @@
 #pragma once
 
-#include "webview.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#include "webview.h"
+
+#include "../def.hpp"
 #include "misc.hpp"
-#include "window/window.hpp"
 #include "filesystem/fs.hpp"
 #include "sys/os/os.hpp"
 #include "sys/hardware/cpu.hpp"
 #include "sys/hardware/display.hpp"
 #include "sys/hardware/mem.hpp"
 
-extern webview::webview w;
 using namespace rapidjson;
 
 namespace api {
 
+    using binding_t = std::function<void(std::string, std::string, void *)>;
+    using sync_binding_t = std::function<std::string(std::string)>;
+
+    class OverApp {
+
+
+        private:
+            void bind_init() noexcept;
+            std::string SetWindowSize(std::string args);
+            std::string SetWindowTitle(std::string args);
+            std::string CloseWindow(std::string args) noexcept;
+            std::string AsyncCPP(std::string args);
+            webview::webview w;
+
+        public:
+            OverApp(bool debug = false, void *winptr = nullptr)
+                : w(debug, winptr) {
+
+                this->bind_init();
+            }
+            void run();
+
+            void bind(const std::string &func_name, sync_binding_t &func);
+            void unbind(std::string func_name);
+            void set_title(std::string title) noexcept;
+            void set_size(std::uint64_t x, std::uint64_t y) noexcept;
+            void navigate_url(const std::string url);
+            void navigate_file(const std::string file);
+            void navigate_resource(const std::string res);
+            void eval(const std::string js);
+            void init(const std::string js);
+            void terminate() noexcept;
+            void *window();
+            void dispatch(std::function<void()> f);
+
+            void LoadResourcesFromFile(std::string filename);
+            template <typename uint>
+            void LoadResourcesFromMemory(std::uint8_t *buf,
+                                         uint *buf_len);
+            // std::string ResourcePath(std::string
+            // res_name); Resource
+            // GetResourceContent(std::string
+            // res_name);
+
+            bool set_signal(std::string signal, std::function<void()> f);
+            // For C++
+            std::string set_signal(std::string args);
+            // For JS
+            // List of all possible signals below
+    };
+
+
+}; // namespace api
+
+
+/* "on-close" : execute function when window is terminated
+ *
+ *
+ *
+ *
+ */
+
+namespace api {
+
+
+    void OverApp::set_title(std::string title) noexcept {
+
+        w.set_title(title);
+    }
+
+    void OverApp::set_size(std::uint64_t x, std::uint64_t y) noexcept {
+
+        w.set_size(x, y, WEBVIEW_HINT_NONE);
+    }
+
+    void OverApp::unbind(std::string func_name) {
+
+        w.unbind(func_name);
+    }
+
+    void OverApp::navigate_url(const std::string url) {
+
+        w.navigate(url);
+    }
+
+    void OverApp::navigate_file(const std::string file) {
+
+        w.navigate("file://" + std::filesystem::absolute(file).u8string());
+    }
+    void OverApp::navigate_resource(const std::string res) {
+
+        w.navigate_res("overload:" + res);
+    }
+
+    void OverApp::eval(const std::string js) {
+
+        w.eval(js);
+    }
+
+    void OverApp::init(const std::string js) {
+
+        w.init(js);
+    }
+
+    void OverApp::terminate() noexcept {
+
+        w.terminate();
+    }
+
+    void OverApp::bind(const std::string &func_name,
+                       api::sync_binding_t &func) {
+
+        w.bind(func_name, func);
+    }
+
+    void OverApp::run() {
+
+        w.run();
+    }
+
+    void *OverApp::window() {
+
+        return w.window();
+    }
+
+    void OverApp::dispatch(std::function<void()> f) {
+
+        w.dispatch(f);
+    }
+
+    std::string OverApp::SetWindowSize(std::string args) {
+
+        Document d;
+        d.Parse(args.c_str());
+
+        w.set_size(d[0].GetUint64(), d[1].GetUint64(), WEBVIEW_HINT_NONE);
+
+        return JTrue;
+    }
+
+    std::string OverApp::SetWindowTitle(std::string args) {
+
+        Document d;
+        d.Parse(args.c_str());
+
+        w.set_title(d[0].GetString());
+
+        return JTrue;
+    }
+
+    std::string OverApp::CloseWindow(std::string args) noexcept {
+
+        w.terminate();
+
+        return JNoRet;
+    }
+
+    template <typename uint>
+    void OverApp::LoadResourcesFromMemory(std::uint8_t *buf,
+                                          uint *buf_len) {
+
+        load_resource_mem(buf, buf_len);
+    }
+
+    void OverApp::LoadResourcesFromFile(std::string filename) {
+
+        load_resource_file(filename);
+    }
+
+
     typedef std::string (*FnPtr)(std::string);
     std::map<std::string, FnPtr> Functions = {
-        {"win_closeWindow", api::CloseWindow},
 
         {"fs_makeDir", api::MakeDir},
         {"fs_readFile", api::ReadFile},
@@ -44,14 +213,14 @@ namespace api {
         {"sys_virtualMemoryUsage", api::GetVirtualMemoryUsage},
         {"sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage}};
 
-    std::string AsyncWithoutValueCPP(std::string args) {
+    static std::string AsyncWithoutValueCPP(std::string args) {
 
         Document d;
         d.Parse(args.c_str());
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
 
-        std::string Func = d[0].GetString();
+        const auto &Func = d[0].GetString();
         d.Erase(d.Begin());
 
         d.Accept(writer);
@@ -63,10 +232,10 @@ namespace api {
         return JNoRet;
     }
 
-    std::string AsyncCPP(std::string args) {
+    std::string OverApp::AsyncCPP(std::string args) {
 
-        const auto lambda = [](std::string function, std::string var,
-                               std::string args) -> void {
+        const auto lambda = [this](std::string function, std::string var,
+                                   std::string args) -> void {
             std::string value = Functions[function](args);
             w.eval(var + " = " + value + ";");
         };
@@ -78,8 +247,8 @@ namespace api {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
 
-        std::string FunctionName = d[0].GetString();
-        std::string VariableName = d[d.Size() - 1].GetString();
+        const auto &FunctionName = d[0].GetString();
+        const auto &VariableName = d[d.Size() - 1].GetString();
 
         d.Erase(d.Begin());
         d.Erase(d.End() - 1);
@@ -94,19 +263,25 @@ namespace api {
         return JNoRet;
     }
 
-    void BindInit() noexcept {
+    void OverApp::bind_init() noexcept {
 
         // Takes 2 arguments and resizes window
         // JS: function win_setWindowSize(width, height)
-        w.bind("win_setWindowSize", api::SetWindowSize);
+        w.bind("win_setWindowSize", [this](std::string args) -> std::string {
+            return this->SetWindowSize(args);
+        });
 
         // Takes 1 argument and changes title of window
         // JS: function win_setWindowTitle(title)
-        w.bind("win_setWindowTitle", api::SetWindowTitle);
+        w.bind("win_setWindowTitle", [this](std::string args) -> std::string {
+            return this->SetWindowTitle(args);
+        });
 
         // Doesn't take anything as argument. Simply closes the application
         // JS: function win_closeWindow()
-        w.bind("win_closeWindow", api::CloseWindow);
+        w.bind("win_closeWindow", [this](std::string args) -> std::string {
+            return this->CloseWindow(args);
+        });
 
         // Takes as argument function name (first argument) and any arguments
         // that is necessary for function
@@ -116,7 +291,9 @@ namespace api {
         // Takes as argument function name (first argument), all arguments
         // necessary for this function and variable name (last argument)
         // JS: function asyncWithValue()
-        w.bind("asyncWithValue", api::AsyncCPP);
+        w.bind("asyncWithValue", [this](std::string args) -> std::string {
+            return this->AsyncCPP(args);
+        });
 
         // Takes as argument path where dir has to be created
         // JS: function fs_makeDir(path)
@@ -207,5 +384,6 @@ namespace api {
         // JS: function sys_procVirtualMemoryUsage()
         w.bind("sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage);
     }
+
 
 }; // namespace api

@@ -30,16 +30,19 @@ namespace api {
 
     std::string GetDisplaySize(std::string args) {
 
-        GdkRectangle workarea = {0};
-        gdk_monitor_get_workarea(
-            gdk_display_get_primary_monitor(gdk_display_get_default()),
-            &workarea);
+        if (getenv("WAYLAND_DISPLAY") != nullptr) {
 
-        return "{\"width\":" + std::to_string(workarea.width) +
-               ",\"height\":" + std::to_string(workarea.height) + "}";
+
+        } else {
+            GdkRectangle workarea = {0};
+            gdk_monitor_get_workarea(
+                gdk_display_get_primary_monitor(gdk_display_get_default()),
+                &workarea);
+
+            return "{\"width\":" + std::to_string(workarea.width) +
+                   ",\"height\":" + std::to_string(workarea.height) + "}";
+        }
     }
-
-
 }; // namespace api
 
 #elif (__APPLE__ && __MACH__)
