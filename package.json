@@ -16,7 +16,7 @@
   "scripts": {
     "start": "vite",
     "dev": "python dev.py",
-    "build": "tsc && vite build",
+    "build": "python build.py",
     "preview": "vite preview"
   },
   "dependencies": {
