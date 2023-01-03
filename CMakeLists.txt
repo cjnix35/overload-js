@@ -136,11 +136,14 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
         if(STATIC_OPENSSL)
                 include_directories(${CMAKE_BINARY_DIR}/packages/openssl-vc141-static-x86_64/build/native/include)
-                target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-static-x86_64/build/native/openssl-vc141-static-x86_64.targets")   
+                target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-static-x86_64/build/native/openssl-vc141-static-x86_64.targets")  
+                set(OPENSSL_ROOT_DIR "${CMAKE_BINARY_DIR}/packages/openssl-vc141-static-x86_64/build/native") 
         else()
                 include_directories(${CMAKE_BINARY_DIR}/packages/openssl-vc142/build/native/include)
                 target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc142/build/native/openssl-vc142.targets")
+                set(OPENSSL_ROOT_DIR "${CMAKE_BINARY_DIR}/packages/openssl-vc142/build/native")
         endif()
+
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
