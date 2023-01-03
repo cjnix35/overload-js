@@ -39,10 +39,10 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     	ARGS install "Microsoft.Windows.ImplementationLibrary" -Version 1.0.220914.1 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
         if (STATIC_OPENSSL)
         exec_program(${NUGET_EXE}
-        ARGS install "openssl-vc141-static-x86_64" --Version 1.1.0 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+        ARGS install "openssl-vc141-static-x86_64" -Version 1.1.0 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
         else()
         exec_program(${NUGET_EXE}
-        ARGS install "openssl-vc142" --Version 1.1.0 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+        ARGS install "openssl-vc142" -Version 1.1.0 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
         endif()
 endif()	
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
