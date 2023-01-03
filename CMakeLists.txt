@@ -116,19 +116,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         set(OPENSSL_ROOT_DIR OPENSSL_MACOS_DIR)
 endif()
 
-if (STATIC_OPENSSL)
-        set(OPENSSL_USE_STATIC_LIBS TRUE)
-endif()
-find_package(OpenSSL REQUIRED)
-target_link_libraries(oversocketio PRIVATE OpenSSL::SSL)
-
-if (SOCKETIO_TLS)
-target_link_libraries(oversocketio PUBLIC sioclient_tls)
-else()
-target_link_libraries(oversocketio PUBLIC sioclient)
-endif()
-
-
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         include_directories(${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/include)
         target_link_libraries(main PUBLIC "${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/x64/WebView2LoaderStatic.lib")
@@ -150,6 +137,18 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         add_library(overdarwin "$CACHE{API_PATH}/sys/os/darwin.cpp")
         target_link_libraries(main PUBLIC overdarwin)
 	set(CMAKE_EXE_LINKER_FLAGS "-framework CoreFoundation -framework WebKit -framework CoreServices -framework CoreGraphics")  
+endif()
+
+if (STATIC_OPENSSL)
+        set(OPENSSL_USE_STATIC_LIBS TRUE)
+endif()
+find_package(OpenSSL REQUIRED)
+target_link_libraries(oversocketio PRIVATE OpenSSL::SSL)
+
+if (SOCKETIO_TLS)
+target_link_libraries(oversocketio PUBLIC sioclient_tls)
+else()
+target_link_libraries(oversocketio PUBLIC sioclient)
 endif()
 
 target_link_libraries(main PUBLIC misc overfs overcpu overdisplay overmem overos overhttp oversocketio)
