@@ -50,8 +50,13 @@ jobs:
         if: ${{ matrix.os == 'macos-latest' }}
         run: brew update && brew install openssl 
 
-      - name: Configure
+      - name: Configure (Windows and Linux)
+        if: ${{ matrix.os != 'macos-latest' }}
         run: mkdir build && cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
+
+      - name: Configure (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: mkdir build && cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DOPENSSL_MACOS_DIR=/usr/local/opt/openssl@3
 
       - name: Compile a release build of overload.js (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
