@@ -81,6 +81,8 @@ if(result)
 endif()
 
 include_directories(${BACKEND_PATH})
+include_directories(${socketio_client_SOURCE_DIR}/src)
+link_directories(${socketio_client_BINARY_DIR})
 
 add_library(overfs "$CACHE{API_PATH}/filesystem/fs.cpp")
 add_library(overcpu "$CACHE{API_PATH}/sys/hardware/cpu.cpp")
