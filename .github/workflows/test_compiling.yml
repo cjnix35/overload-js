@@ -46,6 +46,10 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt-get update && sudo apt-get install libwebkit2gtk-4.0-dev libssl-dev -y
 
+      - name: Install OpenSSL (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: brew update && brew install openssl && brew link --force openssl
+
       - name: Configure
         run: mkdir build && cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 
