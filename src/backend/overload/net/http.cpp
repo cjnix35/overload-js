@@ -1,6 +1,7 @@
 #include "http.hpp"
 
 #define CPPHTTPLIB_NO_EXCEPTIONS
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 
 namespace over {
 
@@ -4945,11 +4946,6 @@ namespace over {
                                                  is_shutting_down, error);
                 }
             } // namespace httplib
-        }     // namespace http
-    }         // namespace net
-
-    using namespace net;
-    using namespace http;
 
     bool net::http::ClientImpl::write_request(Stream &strm, Request &req,
                                               bool close_connection,
@@ -5916,7 +5912,7 @@ namespace over {
             }
 
             if (ssl) {
-                set_nonblocking(sock, true);
+                net::http::detail::set_nonblocking(sock, true);
                 auto bio = BIO_new_socket(static_cast<int>(sock), BIO_NOCLOSE);
                 BIO_set_nbio(bio, 1);
                 SSL_set_bio(ssl, bio, bio);
@@ -5927,11 +5923,11 @@ namespace over {
                         std::lock_guard<std::mutex> guard(ctx_mutex);
                         SSL_free(ssl);
                     }
-                    set_nonblocking(sock, false);
+                    net::http::detail::set_nonblocking(sock, false);
                     return nullptr;
                 }
                 BIO_set_nbio(bio, 0);
-                set_nonblocking(sock, false);
+                net::http::detail::set_nonblocking(sock, false);
             }
 
             return ssl;
@@ -5959,12 +5955,14 @@ namespace over {
                 auto err = SSL_get_error(ssl, res);
                 switch (err) {
                     case SSL_ERROR_WANT_READ:
-                        if (select_read(sock, timeout_sec, timeout_usec) > 0) {
+                        if (net::http::detail::select_read(sock, timeout_sec,
+                                                           timeout_usec) > 0) {
                             continue;
                         }
                         break;
                     case SSL_ERROR_WANT_WRITE:
-                        if (select_write(sock, timeout_sec, timeout_usec) > 0) {
+                        if (net::http::detail::select_write(sock, timeout_sec,
+                                                            timeout_usec) > 0) {
                             continue;
                         }
                         break;
@@ -5984,9 +5982,9 @@ namespace over {
             return process_server_socket_core(
                 svr_sock, sock, keep_alive_max_count, keep_alive_timeout_sec,
                 [&](bool close_connection, bool &connection_closed) {
-                    SSLSocketStream strm(sock, ssl, read_timeout_sec,
-                                         read_timeout_usec, write_timeout_sec,
-                                         write_timeout_usec);
+                    net::http::detail::SSLSocketStream strm(
+                        sock, ssl, read_timeout_sec, read_timeout_usec,
+                        write_timeout_sec, write_timeout_usec);
                     return callback(strm, close_connection, connection_closed);
                 });
         }
@@ -5997,8 +5995,9 @@ namespace over {
                                        time_t read_timeout_usec,
                                        time_t write_timeout_sec,
                                        time_t write_timeout_usec, T callback) {
-            SSLSocketStream strm(sock, ssl, read_timeout_sec, read_timeout_usec,
-                                 write_timeout_sec, write_timeout_usec);
+            net::http::detail::SSLSocketStream strm(
+                sock, ssl, read_timeout_sec, read_timeout_usec,
+                write_timeout_sec, write_timeout_usec);
             return callback(strm);
         }
 
@@ -7191,4 +7190,6 @@ namespace over {
     }
 #endif
 
+        } // namespace http
+    }     // namespace net
 } // namespace over
