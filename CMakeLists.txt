@@ -20,10 +20,6 @@ set(API_PATH "src/backend/overload" CACHE STRING "Path to overload source code")
 set(OVERLOAD_APP_PATH "src/backend/app" CACHE STRING "Path to overload-app backend")
 set(DEFAULT_BUILD_TYPE "Release" CACHE STRING "Define default build type")
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-        set(OPENSSL_MACOS_DIR "" CACHE STRING "Custom path for OpenSSL")
-endif()
-
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
 if(EXISTS "${LOC_PATH}")
     message(FATAL_ERROR "You cannot build in a source directory (or any directory with a CMakeLists.txt file). Please make a build subdirectory. Feel free to remove CMakeCache.txt and CMakeFiles.")
@@ -111,10 +107,6 @@ if(NOT socketio_client_POPULATED)
 endif()
 
 add_subdirectory(${socketio_client_SOURCE_DIR} ${socketio_client_BINARY_DIR})
-
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-        set(OPENSSL_ROOT_DIR OPENSSL_MACOS_DIR)
-endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         include_directories(${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/include)
