@@ -48,7 +48,7 @@ jobs:
 
       - name: Install OpenSSL (MacOS)
         if: ${{ matrix.os == 'macos-latest' }}
-        run: brew update && brew install openssl && brew link --force openssl
+        run: brew update && brew install openssl && export LDFLAGS="-L/usr/local/opt/openssl@3/lib" CPPFLAGS="-I/usr/local/opt/openssl@3/include" 
 
       - name: Configure
         run: mkdir build && cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
