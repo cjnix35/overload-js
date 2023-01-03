@@ -6,6 +6,11 @@ project(overload_js VERSION 1.0
 
 include(CheckIPOSupported)
 include(FetchContent)
+include(ExternalProject)
+include(FindOpenSSL)
+
+option(SOCKETIO_TLS "Build using TLS version of socketio" OFF)
+option(STATIC_OPENSSL "Build using static version of OpenSSL. Requires static version of OpenSSL library placed in PATH." OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -32,6 +37,13 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     	ARGS install "Microsoft.Web.WebView2" -Version 1.0.1549-prerelease -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
 	exec_program(${NUGET_EXE}
     	ARGS install "Microsoft.Windows.ImplementationLibrary" -Version 1.0.220914.1 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+        if (STATIC_OPENSSL)
+        exec_program(${NUGET_EXE}
+        ARGS install "openssl-vc141-static-x86_64" --version 1.1.0 -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+        else()
+        exec_program(${NUGET_EXE}
+        ARGS install "openssl-vc142" --version 1.1.0 -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+        endif()
 endif()	
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         find_package(PkgConfig REQUIRED)
@@ -53,14 +65,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
         "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
-
-FetchContent_Declare(
-  sioclient
-  GIT_REPOSITORY https://github.com/socketio/socket.io-client-cpp.git
-  GIT_TAG        3.1.0
-)
-
-FetchContent_MakeAvailable(sioclient)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -87,13 +91,44 @@ add_library(overhttp "$CACHE{API_PATH}/net/http.cpp")
 add_library(oversocketio "$CACHE{API_PATH}/net/socketio.cpp")
 add_library(misc "$CACHE{API_PATH}/misc.cpp")
 
-target_link_libraries(oversocketio PUBLIC sioclient::sioclient)
+add_compile_definitions(_WEBSOCKETPP_NO_EXCEPTIONS_)
+
+FetchContent_Declare(
+  socketio_client
+  GIT_REPOSITORY https://github.com/Bolderaysky/socketio-cpp-no-exceptions.git
+  GIT_TAG        master
+)
+
+FetchContent_GetProperties(socketio_client)
+if(NOT socketio_client_POPULATED)
+    FetchContent_Populate(socketio_client)
+endif()
+
+if (STATIC_OPENSSL)
+        set(OPENSSL_USE_STATIC_LIBS TRUE)
+endif()
+find_package(OpenSSL REQUIRED)
+target_link_libraries(oversocketio PRIVATE OpenSSL::SSL)
+
+if (SOCKETIO_TLS)
+target_link_libraries(oversocketio PUBLIC sioclient_tls)
+else()
+target_link_libraries(oversocketio PUBLIC sioclient)
+endif()
 
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         include_directories(${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/include)
         target_link_libraries(main PUBLIC "${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/x64/WebView2LoaderStatic.lib")
 	target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets")
+
+        if(STATIC_OPENSSL)
+                include_directories(${CMAKE_BINARY_DIR}/packages/openssl-vc141-static-x86_64/build/native/include)
+                target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-static-x86_64/build/native/openssl-vc141-static-x86_64.targets")   
+        else()
+                include_directories(${CMAKE_BINARY_DIR}/packages/openssl-vc142/build/native/include)
+                target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc142/build/native/openssl-vc142.targets")
+        endif()
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
