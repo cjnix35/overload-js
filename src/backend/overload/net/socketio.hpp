@@ -1,5 +1,6 @@
 #pragma once
 
+#include <malloc.h>
 #include <sio_client.h>
 #include <thread>
 #include <condition_variable>
