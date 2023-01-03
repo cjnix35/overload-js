@@ -63,9 +63,9 @@ namespace over {
             void *window();
             void dispatch(std::function<void()> f);
 
-            void LoadResourcesFromFile(std::string filename);
+            void load_resources_from_file(std::string filename);
             template <typename uint>
-            void LoadResourcesFromMemory(std::uint8_t *buf, uint *buf_len);
+            void load_resources_from_memory(std::uint8_t *buf, uint *buf_len);
             // std::string ResourcePath(std::string
             // res_name); Resource
             // GetResourceContent(std::string
@@ -191,13 +191,13 @@ namespace over {
     }
 
     template <typename uint>
-    void Application::LoadResourcesFromMemory(std::uint8_t *buf,
-                                              uint *buf_len) {
+    void Application::load_resources_from_memory(std::uint8_t *buf,
+                                                 uint *buf_len) {
 
         load_resource_mem(buf, buf_len);
     }
 
-    void Application::LoadResourcesFromFile(std::string filename) {
+    void Application::load_resources_from_file(std::string filename) {
 
         load_resource_file(filename);
     }
