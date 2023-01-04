@@ -93,7 +93,7 @@ add_library(overhttp "$CACHE{API_PATH}/net/http.cpp")
 add_library(oversocketio "$CACHE{API_PATH}/net/socketio.cpp")
 add_library(misc "$CACHE{API_PATH}/misc.cpp")
 
-add_compile_definitions(_WEBSOCKETPP_NO_EXCEPTIONS_)
+add_compile_definitions(_WEBSOCKETPP_NO_EXCEPTIONS_ ASIO_NO_EXCEPTIONS)
 
 FetchContent_Declare(
   socketio_client
