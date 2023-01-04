@@ -1,5 +1,6 @@
 #pragma once
 
+#define _WEBSOCKETPP_NO_EXCEPTIONS_
 #include <malloc.h>
 #include <sio_client.h>
 #include <thread>
