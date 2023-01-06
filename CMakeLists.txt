@@ -112,13 +112,14 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets")
 
         include_directories(${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/include)
-        target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/openssl-vc141-native.targets")  
+        target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/openssl-vc141-native.targets" OpenSSL::applink)  
         set(OPENSSL_ROOT_DIR "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native") 
 
 
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        include_directories(${OPENSSL_INCLUDE_DIR})
         add_library(overdarwin "$CACHE{API_PATH}/sys/os/darwin.cpp")
         target_link_libraries(main PUBLIC overdarwin)
 	set(CMAKE_EXE_LINKER_FLAGS "-framework CoreFoundation -framework WebKit -framework CoreServices -framework CoreGraphics")  
