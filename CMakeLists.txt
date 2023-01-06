@@ -112,7 +112,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets")
 
         include_directories(${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/include)
-        target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/openssl-vc141-native.targets" OpenSSL::applink)  
+        target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/openssl-vc141-native.targets")  
         set(OPENSSL_ROOT_DIR "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native") 
 
 
