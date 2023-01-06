@@ -5,7 +5,7 @@
 #define alloca _alloca
 #endif
 
-#include <sio_client.h>
+#include <src/sio_client.h>
 #include <thread>
 #include <condition_variable>
 
