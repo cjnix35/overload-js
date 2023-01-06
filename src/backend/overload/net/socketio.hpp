@@ -1,10 +1,5 @@
 #pragma once
 
-#ifdef _WIN32
-#include <malloc.h>
-#define alloca _alloca
-#endif
-
 #include <src/sio_client.h>
 #include <thread>
 #include <condition_variable>
