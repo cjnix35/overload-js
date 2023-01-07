@@ -48,7 +48,7 @@ namespace over {
             }
             void run();
 
-            void bind(const std::string &func_name, sync_binding_t &func);
+            void bind(const std::string &func_name, sync_binding_t func);
             void unbind(std::string func_name);
             void set_title(std::string title) noexcept;
             void set_size(std::uint64_t x, std::uint64_t y) noexcept;
@@ -143,7 +143,7 @@ namespace over {
     }
 
     void Application::bind(const std::string &func_name,
-                           over::sync_binding_t &func) {
+                           over::sync_binding_t func) {
 
         w.bind(func_name, func);
     }
