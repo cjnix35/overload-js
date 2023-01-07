@@ -37,9 +37,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     	ARGS install "Microsoft.Web.WebView2" -Version 1.0.1549-prerelease -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
 	exec_program(${NUGET_EXE}
     	ARGS install "Microsoft.Windows.ImplementationLibrary" -Version 1.0.220914.1 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
-        if (STATIC_OPENSSL)
-                set(ENV{STATIC_LINKING_OPENSSL} 1)
-        endif()
         exec_program(${NUGET_EXE}
         ARGS install "openssl-vc141-native" -Version 3.0.0 -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
 endif()	
@@ -112,8 +109,12 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets")
 
         include_directories(${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/include)
+        if(STATIC_OPENSSL)
+        target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/lib/x64/libssl_static.lib")
+        target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/lib/x64/libcrypto_static.lib")
+        else()
         target_link_libraries(main PRIVATE "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native/openssl-vc141-native.targets")  
-        set(OPENSSL_ROOT_DIR "${CMAKE_BINARY_DIR}/packages/openssl-vc141-native/build/native") 
+        endif()
 
 
 endif()
@@ -147,3 +148,6 @@ set_target_properties(main PROPERTIES CXX_EXTENSIONS OFF)
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_libraries(main PUBLIC ${GTK_LIBRARIES} -lpthread)
 endif()
+
+message(STATUS "OpenSSL static linkage: ${STATIC_OPENSSL}")
+message(STATUS "Socketio with TLS: ${SOCKETIO_TLS}")
