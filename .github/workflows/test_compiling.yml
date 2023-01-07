@@ -44,10 +44,19 @@ jobs:
 
       - name: Install necessary packages (Linux)
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: sudo apt-get update && sudo apt-get install libwebkit2gtk-4.0-dev -y
+        run: sudo apt-get update && sudo apt-get install libwebkit2gtk-4.0-dev libssl-dev -y
 
-      - name: Configure
+      - name: Install OpenSSL (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: brew update && brew install openssl 
+
+      - name: Configure (Windows and Linux)
+        if: ${{ matrix.os != 'macos-latest' }}
         run: mkdir build && cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
+
+      - name: Configure (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: mkdir build && cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
 
       - name: Compile a release build of overload.js (Windows)
         if: ${{ matrix.os == 'windows-latest' }}

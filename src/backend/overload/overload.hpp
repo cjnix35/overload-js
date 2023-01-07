@@ -6,7 +6,7 @@
 
 #include "webview.h"
 
-#include "../def.hpp"
+#include "def.hpp"
 #include "misc.hpp"
 #include "filesystem/fs.hpp"
 #include "sys/os/os.hpp"
@@ -16,13 +16,21 @@
 
 using namespace rapidjson;
 
-namespace api {
+namespace over {
 
     using binding_t = std::function<void(std::string, std::string, void *)>;
     using sync_binding_t = std::function<std::string(std::string)>;
 
-    class OverApp {
+    enum hints {
 
+        none,
+        min,
+        max,
+        fixed
+
+    };
+
+    class Application {
 
         private:
             void bind_init() noexcept;
@@ -33,17 +41,19 @@ namespace api {
             webview::webview w;
 
         public:
-            OverApp(bool debug = false, void *winptr = nullptr)
+            Application(bool debug = false, void *winptr = nullptr)
                 : w(debug, winptr) {
 
                 this->bind_init();
             }
             void run();
 
-            void bind(const std::string &func_name, sync_binding_t &func);
+            void bind(const std::string &func_name, sync_binding_t func);
             void unbind(std::string func_name);
             void set_title(std::string title) noexcept;
             void set_size(std::uint64_t x, std::uint64_t y) noexcept;
+            void set_size(std::uint64_t x, std::uint64_t y,
+                          std::uint16_t hint) noexcept;
             void navigate_url(const std::string url);
             void navigate_file(const std::string file);
             void navigate_resource(const std::string res);
@@ -53,10 +63,9 @@ namespace api {
             void *window();
             void dispatch(std::function<void()> f);
 
-            void LoadResourcesFromFile(std::string filename);
+            void load_resources_from_file(std::string filename);
             template <typename uint>
-            void LoadResourcesFromMemory(std::uint8_t *buf,
-                                         uint *buf_len);
+            void load_resources_from_memory(std::uint8_t *buf, uint *buf_len);
             // std::string ResourcePath(std::string
             // res_name); Resource
             // GetResourceContent(std::string
@@ -70,7 +79,7 @@ namespace api {
     };
 
 
-}; // namespace api
+}; // namespace over
 
 
 /* "on-close" : execute function when window is terminated
@@ -80,85 +89,91 @@ namespace api {
  *
  */
 
-namespace api {
+namespace over {
 
 
-    void OverApp::set_title(std::string title) noexcept {
+    void Application::set_title(std::string title) noexcept {
 
         w.set_title(title);
     }
 
-    void OverApp::set_size(std::uint64_t x, std::uint64_t y) noexcept {
+    void Application::set_size(std::uint64_t x, std::uint64_t y) noexcept {
 
         w.set_size(x, y, WEBVIEW_HINT_NONE);
     }
 
-    void OverApp::unbind(std::string func_name) {
+    void Application::set_size(std::uint64_t x, std::uint64_t y,
+                               std::uint16_t hint) noexcept {
+
+        w.set_size(x, y, hint);
+    }
+
+    void Application::unbind(std::string func_name) {
 
         w.unbind(func_name);
     }
 
-    void OverApp::navigate_url(const std::string url) {
+    void Application::navigate_url(const std::string url) {
 
         w.navigate(url);
     }
 
-    void OverApp::navigate_file(const std::string file) {
+    void Application::navigate_file(const std::string file) {
 
         w.navigate("file://" + std::filesystem::absolute(file).u8string());
     }
-    void OverApp::navigate_resource(const std::string res) {
+    void Application::navigate_resource(const std::string res) {
 
         w.navigate_res("overload:" + res);
     }
 
-    void OverApp::eval(const std::string js) {
+    void Application::eval(const std::string js) {
 
         w.eval(js);
     }
 
-    void OverApp::init(const std::string js) {
+    void Application::init(const std::string js) {
 
         w.init(js);
     }
 
-    void OverApp::terminate() noexcept {
+    void Application::terminate() noexcept {
 
         w.terminate();
     }
 
-    void OverApp::bind(const std::string &func_name,
-                       api::sync_binding_t &func) {
+    void Application::bind(const std::string &func_name,
+                           over::sync_binding_t func) {
 
         w.bind(func_name, func);
     }
 
-    void OverApp::run() {
+    void Application::run() {
 
         w.run();
     }
 
-    void *OverApp::window() {
+    void *Application::window() {
 
         return w.window();
     }
 
-    void OverApp::dispatch(std::function<void()> f) {
+    void Application::dispatch(std::function<void()> f) {
 
         w.dispatch(f);
     }
 
-    std::string OverApp::SetWindowSize(std::string args) {
+    std::string Application::SetWindowSize(std::string args) {
 
         Document d;
         d.Parse(args.c_str());
 
-        w.set_size(d[0].GetUint64(), d[1].GetUint64(), WEBVIEW_HINT_NONE);
+        w.set_size(d[0].GetUint64(), d[1].GetUint64(), d[2].GetUint64());
 
         return JTrue;
     }
 
-    std::string OverApp::SetWindowTitle(std::string args) {
+    std::string Application::SetWindowTitle(std::string args) {
 
         Document d;
         d.Parse(args.c_str());
@@ -168,7 +183,7 @@ namespace api {
         return JTrue;
     }
 
-    std::string OverApp::CloseWindow(std::string args) noexcept {
+    std::string Application::CloseWindow(std::string args) noexcept {
 
         w.terminate();
 
@@ -176,13 +191,13 @@ namespace api {
     }
 
     template <typename uint>
-    void OverApp::LoadResourcesFromMemory(std::uint8_t *buf,
-                                          uint *buf_len) {
+    void Application::load_resources_from_memory(std::uint8_t *buf,
+                                                 uint *buf_len) {
 
         load_resource_mem(buf, buf_len);
     }
 
-    void OverApp::LoadResourcesFromFile(std::string filename) {
+    void Application::load_resources_from_file(std::string filename) {
 
         load_resource_file(filename);
     }
@@ -191,27 +206,27 @@ namespace api {
     typedef std::string (*FnPtr)(std::string);
     std::map<std::string, FnPtr> Functions = {
 
-        {"fs_makeDir", api::MakeDir},
-        {"fs_readFile", api::ReadFile},
-        {"fs_writeFile", api::WriteFile},
-        {"fs_appendFile", api::AppendFile},
-        {"fs_removeFile", api::RemoveFile},
-        {"fs_removeDir", api::RemoveDir},
-        {"fs_listDir", api::ListDir},
-        {"fs_absolutePath", api::AbsolutePath},
+        {"fs_makeDir", over::fs::MakeDir},
+        {"fs_readFile", over::fs::ReadFile},
+        {"fs_writeFile", over::fs::WriteFile},
+        {"fs_appendFile", over::fs::AppendFile},
+        {"fs_removeFile", over::fs::RemoveFile},
+        {"fs_removeDir", over::fs::RemoveDir},
+        {"fs_listDir", over::fs::ListDir},
+        {"fs_absolutePath", over::fs::AbsolutePath},
 
-        {"sys_version", api::Version},
-        {"sys_platform", api::Platform},
-        {"sys_cpuFrequency", api::CPUFrequency},
-        {"sys_cpuVendor", api::CPUVendor},
-        {"sys_cpuModel", api::CPUModel},
-        {"sys_displaySize", api::GetDisplaySize},
-        {"sys_totalPhysMemory", api::GetTotalPhysicalMemory},
-        {"sys_physMemoryUsage", api::GetPhysicalMemoryUsage},
-        {"sys_procPhysMemoryUsage", api::GetProcPhysMemoryUsage},
-        {"sys_totalVirtualMemory", api::GetTotalVirtualMemory},
-        {"sys_virtualMemoryUsage", api::GetVirtualMemoryUsage},
-        {"sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage}};
+        {"sys_version", over::sys::Version},
+        {"sys_platform", over::sys::Platform},
+        {"sys_cpuFrequency", over::sys::CPUFrequency},
+        {"sys_cpuVendor", over::sys::CPUVendor},
+        {"sys_cpuModel", over::sys::CPUModel},
+        {"sys_displaySize", over::sys::GetDisplaySize},
+        {"sys_totalPhysMemory", over::sys::GetTotalPhysicalMemory},
+        {"sys_physMemoryUsage", over::sys::GetPhysicalMemoryUsage},
+        {"sys_procPhysMemoryUsage", over::sys::GetProcPhysMemoryUsage},
+        {"sys_totalVirtualMemory", over::sys::GetTotalVirtualMemory},
+        {"sys_virtualMemoryUsage", over::sys::GetVirtualMemoryUsage},
+        {"sys_procVirtualMemoryUsage", over::sys::GetProcVirtualMemoryUsage}};
 
     static std::string AsyncWithoutValueCPP(std::string args) {
 
@@ -227,12 +242,12 @@ namespace api {
 
         args = buffer.GetString();
 
-        std::thread(api::Functions[Func], args).detach();
+        std::thread(over::Functions[Func], args).detach();
 
         return JNoRet;
     }
 
-    std::string OverApp::AsyncCPP(std::string args) {
+    std::string Application::AsyncCPP(std::string args) {
 
         const auto lambda = [this](std::string function, std::string var,
                                    std::string args) -> void {
@@ -263,7 +278,7 @@ namespace api {
         return JNoRet;
     }
 
-    void OverApp::bind_init() noexcept {
+    void Application::bind_init() noexcept {
 
         // Takes 2 arguments and resizes window
         // JS: function win_setWindowSize(width, height)
@@ -286,7 +301,7 @@ namespace api {
         // Takes as argument function name (first argument) and any arguments
         // that is necessary for function
         // JS: function asyncWithoutValue()
-        w.bind("asyncWithoutValue", api::AsyncWithoutValueCPP);
+        w.bind("asyncWithoutValue", over::AsyncWithoutValueCPP);
 
         // Takes as argument function name (first argument), all arguments
         // necessary for this function and variable name (last argument)
@@ -297,93 +312,94 @@ namespace api {
 
         // Takes as argument path where dir has to be created
         // JS: function fs_makeDir(path)
-        w.bind("fs_makeDir", api::MakeDir);
+        w.bind("fs_makeDir", over::fs::MakeDir);
 
         // Takes path to file as argument and reads file
         // JS: function fs_readFile(filename)
-        w.bind("fs_readFile", api::ReadFile);
+        w.bind("fs_readFile", over::fs::ReadFile);
 
         // Takes 2 arguments: path to file and what to write. Writes provided
         // data in the provided file JS: function fs_writeFile(filename, data)
-        w.bind("fs_writeFile", api::WriteFile);
+        w.bind("fs_writeFile", over::fs::WriteFile);
 
         // Do the same as function above, but if file exists, doesn't re-write
         // existing data in file. Instead write at the end of the file
         // JS:function fs_appendFile(filename, data)
-        w.bind("fs_appendFile", api::AppendFile);
+        w.bind("fs_appendFile", over::fs::AppendFile);
 
         // Takes path to file as argument. Deletes file that is provided
         // JS: function fs_removeFile(filename)
-        w.bind("fs_removeFile", api::RemoveFile);
+        w.bind("fs_removeFile", over::fs::RemoveFile);
 
         // Do the same as function above, but can delete directory with files
         // JS: function fs_removeDir(dirname)
-        w.bind("fs_removeDir", api::RemoveDir);
+        w.bind("fs_removeDir", over::fs::RemoveDir);
 
         // Takes directory as argument. Lists directory and returns array of
         // files
         // JS: function fs_listDir(dirname)
-        w.bind("fs_listDir", api::ListDir);
+        w.bind("fs_listDir", over::fs::ListDir);
 
         // Takes relative path as argument. Converts relative path to absolute
         // JS: function fs_absolutePath(path)
-        w.bind("fs_absolutePath", api::AbsolutePath);
+        w.bind("fs_absolutePath", over::fs::AbsolutePath);
 
         // Doesn't take any arguments. Returns system version, for example:
         // Linux (6.0.6-arch1-1)
         // JS: function sys_version()
-        w.bind("sys_version", api::Version);
+        w.bind("sys_version", over::sys::Version);
 
         // Doesn't take any arguments. Returns system name in lowercase
         // JS: function sys_platform()
-        w.bind("sys_platform", api::Platform);
+        w.bind("sys_platform", over::sys::Platform);
 
         // Doesn't take any arguments. Returns current CPU frequency in kHz
         // JS: function sys_cpuFrequency()
-        w.bind("sys_cpuFrequency", api::CPUFrequency);
+        w.bind("sys_cpuFrequency", over::sys::CPUFrequency);
 
         // Doesn't take any arguments. Returns CPU vendor
         // JS: function sys_cpuVendor()
-        w.bind("sys_cpuVendor", api::CPUVendor);
+        w.bind("sys_cpuVendor", over::sys::CPUVendor);
 
         // Doesn't take any arguments. Returns CPU model name
         // JS: function sys_cpuModel()
-        w.bind("sys_cpuModel", api::CPUModel);
+        w.bind("sys_cpuModel", over::sys::CPUModel);
 
         // Doesn't take any arguments. Returns display width and height in JSON
         // JS: function sys_displaySize()
-        w.bind("sys_displaySize", api::GetDisplaySize);
+        w.bind("sys_displaySize", over::sys::GetDisplaySize);
 
         // Doesn't take any arguments. Returns how much physical memory is
         // installed on current device
         // JS: function sys_totalPhysMemory()
-        w.bind("sys_totalPhysMemory", api::GetTotalPhysicalMemory);
+        w.bind("sys_totalPhysMemory", over::sys::GetTotalPhysicalMemory);
 
         // Doesn't take any arguments. Returns how much physical memory is
         // currently in use
         // JS: function sys_totalPhysMemoryUsage()
-        w.bind("sys_physMemoryUsage", api::GetPhysicalMemoryUsage);
+        w.bind("sys_physMemoryUsage", over::sys::GetPhysicalMemoryUsage);
 
         // Doesn't take any arguments. Returns how much physical memory is
         // currently in use by this process
         // JS: function sys_procPhysMemoryUsage()
-        w.bind("sys_procPhysMemoryUsage", api::GetProcPhysMemoryUsage);
+        w.bind("sys_procPhysMemoryUsage", over::sys::GetProcPhysMemoryUsage);
 
         // Doesn't take any arguments. Returns how much total virtual memory is
         // on current device
         // JS: function sys_totalVirtualMemory()
-        w.bind("sys_totalVirtualMemory", api::GetTotalVirtualMemory);
+        w.bind("sys_totalVirtualMemory", over::sys::GetTotalVirtualMemory);
 
         // Doesn't take any arguments. Returns how much virtual memory is
         // currently in use
         // JS: function sys_virtualMemoryUsage()
-        w.bind("sys_virtualMemoryUsage", api::GetVirtualMemoryUsage);
+        w.bind("sys_virtualMemoryUsage", over::sys::GetVirtualMemoryUsage);
 
         // Doesn't take any arguments. Returns how much virtual memory is
         // currently in use by this process
         // JS: function sys_procVirtualMemoryUsage()
-        w.bind("sys_procVirtualMemoryUsage", api::GetProcVirtualMemoryUsage);
+        w.bind("sys_procVirtualMemoryUsage",
+               over::sys::GetProcVirtualMemoryUsage);
     }
 
 
-}; // namespace api
+}; // namespace over

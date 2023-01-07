@@ -16,10 +16,12 @@
 
 #include "../../misc.hpp"
 
-namespace api {
+namespace over {
 
+    namespace sys {
 
-    std::string GetDisplaySize(std::string args);
+        std::string GetDisplaySize(std::string args);
 
+    };
 
-}; // namespace api
+}; // namespace over
